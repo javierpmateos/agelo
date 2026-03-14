@@ -1,13 +1,3 @@
-/**
- * PaymentEngine — conecta x402 con el TreasuryEngine.
- *
- * Cuando el agente necesita pagar un servicio x402:
- * 1. Verifica si hay suficiente USDT líquido
- * 2. Si no hay, retira de Aave exactamente lo necesario
- * 3. Paga via x402
- * 4. Redeposita cualquier exceso sobre la reserva mínima
- */
-
 import { wrapFetchWithPayment, x402Client } from '@x402/fetch'
 import { registerExactEvmScheme } from '@x402/evm/exact/client'
 import { getPlasmaAccount } from '../wallet/wdk-setup.js'
@@ -15,12 +5,11 @@ import { TreasuryEngine } from './treasury-engine.js'
 import 'dotenv/config'
 
 export interface PaymentReceipt {
-  url:          string
-  amount_usdt:  string
-  tx_hash?:     string
-  withdrew_from_aave: boolean
-  redeposited:  boolean
-  timestamp:    string
+  url:         string
+  amount_usdt: string
+  tx_hash?:    string
+  network?:    string
+  timestamp:   string
 }
 
 export class PaymentEngine {
@@ -38,61 +27,66 @@ export class PaymentEngine {
     return this.fetchWithPayment
   }
 
-  /**
-   * Hace un request x402 — paga automáticamente con USDT0 en Plasma.
-   * El Treasury gestiona la liquidez en Arbitrum por separado.
-   */
   async paidFetch<T = unknown>(
     url: string,
     options: RequestInit = {}
   ): Promise<{ data: T; receipt: PaymentReceipt }> {
     const fetchFn = await this.getFetchWithPayment()
-
-    console.log(`\n  💳 x402 request: ${url}`)
+    console.log(`\n  💳 x402: ${url.replace('http://localhost:4021', '')}`)
 
     const res = await fetchFn(url, options)
 
-    // Extraer receipt del header
+    // Decode payment-response header (base64 JSON)
+    let tx_hash:    string | undefined
+    let network:    string | undefined
     let amount_usdt = '0.000000'
-    let tx_hash: string | undefined
 
-    const payHeader = res.headers.get('X-PAYMENT-RESPONSE') || res.headers.get('payment-response')
+    const payHeader = res.headers.get('payment-response') || res.headers.get('X-PAYMENT-RESPONSE')
     if (payHeader) {
       try {
-        const parsed = JSON.parse(payHeader)
-        amount_usdt = parsed.amount ? (Number(parsed.amount) / 1e6).toFixed(6) : '0.000001'
-        tx_hash     = parsed.transaction
+        const decoded = JSON.parse(Buffer.from(payHeader, 'base64').toString())
+        tx_hash    = decoded.transaction
+        network    = decoded.network
+        // Amount comes from the paymentMiddleware config — read from the 402 response
+        // We'll look it up from our known price table
+        amount_usdt = this.estimateAmount(url)
       } catch {
-        amount_usdt = '0.000001'
+        // fallback
       }
     }
 
-    if (!res.ok) {
-      const body = await res.text()
-      throw new Error(`HTTP ${res.status}: ${body}`)
-    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
 
     const data = await res.json() as T
 
     const receipt: PaymentReceipt = {
-      url,
-      amount_usdt,
-      tx_hash,
-      withdrew_from_aave: false,
-      redeposited:        false,
-      timestamp:          new Date().toISOString(),
+      url, amount_usdt, tx_hash, network,
+      timestamp: new Date().toISOString(),
     }
-
     this.receipts.push(receipt)
-    console.log(`  ✅ Paid ${amount_usdt} USDT0`)
+
+    console.log(`  ✅ Paid ${amount_usdt} USDT0${tx_hash ? ` | tx: ${tx_hash.slice(0,18)}...` : ''}`)
+    if (tx_hash) console.log(`     https://plasmascan.to/tx/${tx_hash}`)
 
     return { data, receipt }
   }
 
-  getReceipts()    { return [...this.receipts] }
-  getTotalSpent()  {
-    return this.receipts
-      .reduce((acc, r) => acc + Number(r.amount_usdt), 0)
-      .toFixed(6)
+  // Precio estimado por endpoint (en sync con marketplace.ts)
+  private estimateAmount(url: string): string {
+    if (url.includes('/api/crypto-price'))    return '0.001000'
+    if (url.includes('/api/news-summary'))     return '0.005000'
+    if (url.includes('/api/market-analysis'))  return '0.010000'
+    if (url.includes('/api/onchain-metrics'))  return '0.010000'
+    if (url.includes('/api/aave-rates'))       return '0.003000'
+    if (url.includes('/api/aave-position'))    return '0.005000'
+    if (url.includes('/api/financial-report')) return '0.010000'
+    if (url.includes('/api/defi-strategy'))    return '0.020000'
+    if (url.includes('/api/ai-inference'))     return '0.050000'
+    return '0.001000'
+  }
+
+  getReceipts()   { return [...this.receipts] }
+  getTotalSpent() {
+    return this.receipts.reduce((acc, r) => acc + Number(r.amount_usdt), 0).toFixed(6)
   }
 }
