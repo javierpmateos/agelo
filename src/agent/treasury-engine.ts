@@ -61,16 +61,12 @@ export class TreasuryEngine {
     ])
 
     const liquidUsdt = BigInt(liquidRaw ?? 0n)
-    const aaveUsdt   = position
-      ? BigInt(position.totalCollateral)
-      : 0n
 
     return {
       liquidUsdt,
-      aaveUsdt,
       liquidHuman:  (Number(liquidUsdt) / 10 ** USDT_DECIMALS).toFixed(2),
-      aaveHuman:    (Number(aaveUsdt) / 1e8).toFixed(2),
-      healthFactor: position ? (BigInt(position.healthFactor) > 1000000000000000000000n ? '∞' : (Number(BigInt(position.healthFactor)) / 1e18).toFixed(2)) : 'N/A',
+      aaveHuman:    position?.totalCollateral ?? '0.00',
+      healthFactor: position?.healthFactor ?? 'N/A',
       apys,
       position,
     }
@@ -205,7 +201,7 @@ Respond with JSON only:
     const deficit = requiredAmount - available
     const buffer  = 500_000n  // 0.5 USDT buffer
 
-    if (state.aaveUsdt === 0n) {
+    if (!state.position || state.aaveHuman === "0.00") {
       console.log(`  ⚠️  No Aave position to withdraw from`)
       return false
     }

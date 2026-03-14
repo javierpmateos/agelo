@@ -6,8 +6,8 @@ export const AAVE_ASSETS = {
   USDC: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
 }
 
-// Aave V3 Pool en Arbitrum
 const AAVE_POOL = "0x794a61358D6845594F94dc1DB02A252b5b4814aD"
+const MAX_UINT256 = BigInt("115792089237316195423570985008687907853269984665640564039457584007913129639935")
 
 async function getAave() {
   const account = await getArbAccount(0)
@@ -18,11 +18,15 @@ export async function getAavePosition() {
   try {
     const { aave } = await getAave()
     const data = await aave.getAccountData()
+    const toUsd = (raw: bigint) => (Number(raw) / 1e8).toFixed(2)
+    const hf = data.healthFactor >= MAX_UINT256
+      ? '∞'
+      : (Number(data.healthFactor) / 1e18).toFixed(2)
     return {
-      totalCollateral: data.totalCollateralBase.toString(),
-      totalDebt:       data.totalDebtBase.toString(),
-      availableBorrow: data.availableBorrowsBase.toString(),
-      healthFactor:    data.healthFactor.toString(),
+      totalCollateral: toUsd(data.totalCollateralBase),
+      totalDebt:       toUsd(data.totalDebtBase),
+      availableBorrow: toUsd(data.availableBorrowsBase),
+      healthFactor:    hf,
       ltv:             data.ltv.toString(),
     }
   } catch (err: any) {
@@ -35,11 +39,8 @@ export async function supplyToAave(assetSymbol: string, amount: bigint) {
   const token = AAVE_ASSETS[assetSymbol as keyof typeof AAVE_ASSETS]
   if (!token) throw new Error(`Unknown asset: ${assetSymbol}`)
   const { aave, account } = await getAave()
-
-  // Approve Aave pool to spend tokens
   console.log(`  🔓 Approving ${assetSymbol} for Aave...`)
   await account.approve({ token, spender: AAVE_POOL, amount })
-
   console.log(`  🏦 Supplying ${Number(amount)/1e6} ${assetSymbol} to Aave V3 on Arbitrum...`)
   const result = await aave.supply({ token, amount })
   console.log(`  ✅ Supplied! tx: ${result.hash}`)
@@ -50,7 +51,6 @@ export async function withdrawFromAave(assetSymbol: string, amount: bigint) {
   const token = AAVE_ASSETS[assetSymbol as keyof typeof AAVE_ASSETS]
   if (!token) throw new Error(`Unknown asset: ${assetSymbol}`)
   const { aave } = await getAave()
-
   console.log(`  🏦 Withdrawing ${Number(amount)/1e6} ${assetSymbol} from Aave V3 Arbitrum...`)
   const result = await aave.withdraw({ token, amount })
   console.log(`  ✅ Withdrawn! tx: ${result.hash}`)
@@ -58,6 +58,8 @@ export async function withdrawFromAave(assetSymbol: string, amount: bigint) {
 }
 
 export async function getAaveApys(): Promise<Record<string, { supplyApy: string; borrowApy: string }>> {
+  // TODO: read live from Aave UI Data Provider on Arbitrum
+  // Hardcoded approximate rates (March 2026)
   return {
     USDT: { supplyApy: "4.8%", borrowApy: "6.2%" },
     USDC: { supplyApy: "4.2%", borrowApy: "5.9%" },
