@@ -69,8 +69,8 @@ export class TreasuryEngine {
       liquidUsdt,
       aaveUsdt,
       liquidHuman:  (Number(liquidUsdt) / 10 ** USDT_DECIMALS).toFixed(2),
-      aaveHuman:    (Number(aaveUsdt)   / 10 ** USDT_DECIMALS).toFixed(2),
-      healthFactor: position?.healthFactor ?? 'N/A',
+      aaveHuman:    (Number(aaveUsdt) / 1e8).toFixed(2),
+      healthFactor: position ? (BigInt(position.healthFactor) > 1000000000000000000000n ? '∞' : (Number(BigInt(position.healthFactor)) / 1e18).toFixed(2)) : 'N/A',
       apys,
       position,
     }
