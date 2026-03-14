@@ -56,8 +56,8 @@ export async function getUSDT0Balance(address: string): Promise<string> {
 }
 
 export async function getBaseWalletInfo() {
-  const { getBaseAccount } = await import('./wdk-setup.js')
-  const account = await getBaseAccount(0)
+  const { getArbAccount } = await import('./wdk-setup.js')
+  const account = await getArbAccount(0)
   const address = await account.getAddress()
   return { address }
 }

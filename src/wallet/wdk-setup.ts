@@ -3,16 +3,6 @@ import WalletManagerEvm from "@tetherto/wdk-wallet-evm"
 import * as dotenv from "dotenv"
 dotenv.config()
 
-const PLASMA_CONFIG = {
-  chainId: 9745,
-  provider: process.env.PLASMA_RPC || "https://rpc.plasma.to",
-}
-
-const BASE_CONFIG = {
-  chainId: 8453,
-  provider: process.env.BASE_RPC || "https://mainnet.base.org",
-}
-
 let _wdk: any = null
 
 export async function getWDK() {
@@ -20,9 +10,10 @@ export async function getWDK() {
   const seed = process.env.AGENT_SEED_PHRASE
   if (!seed) throw new Error("AGENT_SEED_PHRASE not set")
   _wdk = new WDK(seed)
-    .registerWallet("plasma", WalletManagerEvm, PLASMA_CONFIG)
-    .registerWallet("base", WalletManagerEvm, BASE_CONFIG)
-  console.log("  🔧 WDK initialized (Plasma + Base)")
+    .registerWallet("plasma",   WalletManagerEvm, { provider: process.env.PLASMA_RPC || "https://rpc.plasma.to" })
+    .registerWallet("ethereum", WalletManagerEvm, { provider: process.env.ETH_RPC    || "https://eth.drpc.org" })
+    .registerWallet("arbitrum", WalletManagerEvm, { provider: process.env.ARB_RPC    || "https://arb1.arbitrum.io/rpc" })
+  console.log("  🔧 WDK initialized (Plasma + Ethereum + Arbitrum)")
   return _wdk
 }
 
@@ -31,7 +22,12 @@ export async function getPlasmaAccount(index = 0) {
   return wdk.getAccount("plasma", index)
 }
 
-export async function getBaseAccount(index = 0) {
+export async function getEthAccount(index = 0) {
   const wdk = await getWDK()
-  return wdk.getAccount("base", index)
+  return wdk.getAccount("ethereum", index)
+}
+
+export async function getArbAccount(index = 0) {
+  const wdk = await getWDK()
+  return wdk.getAccount("arbitrum", index)
 }
