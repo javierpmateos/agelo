@@ -1,20 +1,22 @@
 import AaveProtocolEvm from "@tetherto/wdk-protocol-lending-aave-evm"
 import { getArbAccount } from "../wallet/wdk-setup.js"
 
-// Aave V3 Arbitrum tokens
 export const AAVE_ASSETS = {
   USDT: "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
   USDC: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
 }
 
+// Aave V3 Pool en Arbitrum
+const AAVE_POOL = "0x794a61358D6845594F94dc1DB02A252b5b4814aD"
+
 async function getAave() {
   const account = await getArbAccount(0)
-  return new AaveProtocolEvm(account as any)
+  return { aave: new AaveProtocolEvm(account as any), account }
 }
 
 export async function getAavePosition() {
   try {
-    const aave = await getAave()
+    const { aave } = await getAave()
     const data = await aave.getAccountData()
     return {
       totalCollateral: data.totalCollateralBase.toString(),
@@ -32,8 +34,13 @@ export async function getAavePosition() {
 export async function supplyToAave(assetSymbol: string, amount: bigint) {
   const token = AAVE_ASSETS[assetSymbol as keyof typeof AAVE_ASSETS]
   if (!token) throw new Error(`Unknown asset: ${assetSymbol}`)
-  const aave = await getAave()
-  console.log(`  🏦 Supplying ${amount} ${assetSymbol} to Aave V3 on Arbitrum...`)
+  const { aave, account } = await getAave()
+
+  // Approve Aave pool to spend tokens
+  console.log(`  🔓 Approving ${assetSymbol} for Aave...`)
+  await account.approve({ token, spender: AAVE_POOL, amount })
+
+  console.log(`  🏦 Supplying ${Number(amount)/1e6} ${assetSymbol} to Aave V3 on Arbitrum...`)
   const result = await aave.supply({ token, amount })
   console.log(`  ✅ Supplied! tx: ${result.hash}`)
   return result
@@ -42,8 +49,9 @@ export async function supplyToAave(assetSymbol: string, amount: bigint) {
 export async function withdrawFromAave(assetSymbol: string, amount: bigint) {
   const token = AAVE_ASSETS[assetSymbol as keyof typeof AAVE_ASSETS]
   if (!token) throw new Error(`Unknown asset: ${assetSymbol}`)
-  const aave = await getAave()
-  console.log(`  🏦 Withdrawing ${amount} ${assetSymbol} from Aave V3 Arbitrum...`)
+  const { aave } = await getAave()
+
+  console.log(`  🏦 Withdrawing ${Number(amount)/1e6} ${assetSymbol} from Aave V3 Arbitrum...`)
   const result = await aave.withdraw({ token, amount })
   console.log(`  ✅ Withdrawn! tx: ${result.hash}`)
   return result
