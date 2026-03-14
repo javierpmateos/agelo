@@ -1,36 +1,44 @@
 import express from 'express'
 import cors from 'cors'
-import { createAgentWallet } from './wallet/agent-wallet.js'
-import { PayGateAgent } from './agent/agent.js'
+import { AgeloAgent } from './agent/agent.js'
 import 'dotenv/config'
 
 const PORT = Number(process.env.AGENT_PORT ?? 4022)
 
 async function main() {
-  const seedPhrase = process.env.AGENT_SEED_PHRASE
-  if (!seedPhrase) throw new Error('AGENT_SEED_PHRASE not set in .env')
+  const agent = new AgeloAgent()
 
-  const wallet = await createAgentWallet(seedPhrase)
-  const agent = new PayGateAgent(wallet)
+  // Arranca el loop autónomo del treasury en background
+  agent.startAutonomousLoop()
 
   const app = express()
   app.use(cors())
   app.use(express.json())
 
   app.get('/health', (_req, res) => {
-    res.json({ status: 'ok', service: 'PayGate Agent API' })
+    res.json({ status: 'ok', service: 'Agelo Agent API' })
   })
 
-  app.get('/wallet', async (_req, res) => {
-    const balance = await wallet.getUsdtBalance()
+  app.get('/portfolio', async (_req, res) => {
+    const state = await agent.treasury.getState()
     res.json({
-      address: wallet.address,
-      balance_usdt0: balance,
-      chain: 'Plasma',
-      network_id: process.env.PLASMA_NETWORK_ID ?? 'eip155:9745',
+      liquid_usdt:   state.liquidHuman,
+      aave_usdt:     state.aaveHuman,
+      health_factor: state.healthFactor,
+      apy:           state.apys.USDT?.supplyApy,
+      total_usdt:    (parseFloat(state.liquidHuman) + parseFloat(state.aaveHuman)).toFixed(2),
+      decisions:     agent.treasury.getDecisions(),
     })
   })
 
+  app.get('/receipts', (_req, res) => {
+    res.json({
+      items:       agent.payments.getReceipts(),
+      total_spent: agent.payments.getTotalSpent(),
+    })
+  })
+
+  // SSE streaming para el dashboard
   app.post('/task', async (req, res) => {
     const { task } = req.body as { task: string }
     if (!task) { res.status(400).json({ error: 'task is required' }); return }
@@ -39,17 +47,17 @@ async function main() {
     res.setHeader('Cache-Control', 'no-cache')
     res.setHeader('Connection', 'keep-alive')
 
-    const send = (event: string, data: unknown) => {
+    const send = (event: string, data: unknown) =>
       res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
-    }
 
     send('start', { task, timestamp: new Date().toISOString() })
 
     try {
       const result = await agent.run(task)
-      send('answer', { text: result.answer })
+      send('answer',   { text: result.answer })
       send('receipts', { items: result.receipts, total_spent: result.totalSpent })
-      send('done', { success: true })
+      send('decisions',{ items: result.decisions })
+      send('done',     { success: true })
     } catch (err) {
       send('error', { message: err instanceof Error ? err.message : String(err) })
     }
@@ -58,9 +66,10 @@ async function main() {
   })
 
   app.listen(PORT, () => {
-    console.log(`✅ PayGate Agent API on http://localhost:${PORT}`)
-    console.log(`   POST /task   → run a task`)
-    console.log(`   GET  /wallet → wallet balance`)
+    console.log(`\n✅ Agelo API on http://localhost:${PORT}`)
+    console.log(`   POST /task       → run a task (SSE)`)
+    console.log(`   GET  /portfolio  → wallet + Aave state`)
+    console.log(`   GET  /receipts   → payment history`)
   })
 }
 
