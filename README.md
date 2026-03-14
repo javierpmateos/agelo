@@ -1,123 +1,177 @@
-# Agelo 🤖⚡
+# Agelo — Tu USDT nunca duerme
 
-**Autonomous AI agent that pays for services via x402 HTTP micropayments using USDT0 on Plasma.**
+> Agente financiero autónomo que maximiza yield en Aave V3, paga servicios vía x402, y reporta todo con IA — construido sobre el stack completo de Tether WDK.
 
-No subscriptions. No API keys. Pay per call.
+**Hackathon:** Tether Hackathon Galáctica: WDK Edition 1  
+**Track:** 🤖 Agent Wallets  
+**License:** Apache 2.0
 
 ---
 
-## How It Works
+## ¿Qué hace?
+
+Agelo es una alcancía inteligente con tres comportamientos autónomos:
+
+**1. Tu plata rinde mientras no la usás**  
+Detecta USDT idle en tu wallet. Lo deposita en Aave V3 (Arbitrum) automáticamente. Cada 30 minutos evalúa: ¿deposito más? ¿el APY bajó? ¿retiro? — todo con razonamiento de LLM documentado.
+
+**2. Cuando hay que pagar, paga sola**  
+Llega un cobro vía x402 (HTTP 402 Payment Required). Agelo verifica si hay suficiente líquido. Si no, retira de Aave exactamente lo necesario, paga en USDT0 en Plasma, y redeposita el sobrante.
+
+**3. Te cuenta cómo te fue**  
+Genera reportes financieros con IA: yield acumulado, gastos por servicio, estado del portfolio, recomendaciones — pagados como servicios x402.
 ```
-User task → Claude Agent → identifies needed services →
-each service returns HTTP 402 → WDK wallet signs EIP-3009 →
-fetchWithPayment retries with X-PAYMENT header →
-Semantic facilitator verifies + settles → 200 OK + data →
-Agent synthesizes → answer + receipt
+Builders define the rules → Agents do the work → Value settles onchain
 ```
 
-The agent autonomously decides which paid services it needs, pays for each one on-chain, and returns a full answer with a payment receipt.
+---
+
+## Transacciones reales verificables
+
+Todas las transacciones fueron ejecutadas durante el hackathon:
+
+| Acción | Chain | TX Hash | Explorer |
+|--------|-------|---------|----------|
+| Supply 8.41 USDT → Aave V3 | Arbitrum | `0xee856de3...` | [arbiscan.io](https://arbiscan.io/tx/0xee856de38ac3b1dd78f400b35affee1eb2a6659e48ec51e490f60e9227fb8b80) |
+| Withdraw 3.5 USDT ← Aave V3 | Arbitrum | `0xd7ccbe12...` | [arbiscan.io](https://arbiscan.io/tx/0xd7ccbe12a81e167525927a84c556c87492cc701ec7cf531991cf761424c893b8) |
+| x402 payment (aave-rates) | Plasma | `0x7738691a...` | [plasmascan.to](https://plasmascan.to/tx/0x7738691a574e6c9df0ceb429074bb5ddfe91ae025df1f2f370aac09c9243ad9b) |
+| x402 payment (financial-report) | Plasma | `0xb97ab2e2...` | [plasmascan.to](https://plasmascan.to/tx/0xb97ab2e25e4bba54c53dbf6ca1791b3ee0081cdba19d6c83df89888f8f9b1d08) |
+
+Wallet: `0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6`  
+→ [Arbitrum](https://arbiscan.io/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6) · [Plasma](https://plasmascan.to/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6)
 
 ---
 
-## Tech Stack
-
-| Component | Technology |
-|---|---|
-| Agent LLM | Claude (Anthropic) |
-| Wallet | `@tetherto/wdk-wallet-evm` |
-| Payments | x402 protocol (`@x402/fetch`, `@x402/express`) |
-| Token | USDT0 |
-| Chain | Plasma (`eip155:9745`) — near-zero fees, instant finality |
-| Facilitator | Semantic (`https://x402.semanticpay.io/`) |
+## Arquitectura
+```
+User / External Agent
+        ↓ natural language task
+   AgeloAgent (Claude Haiku)
+        ↓ tool calls
+  ┌─────────────────────────────────────┐
+  │  TreasuryEngine (loop 30 min)       │
+  │  ├─ WDK wallet-evm (Arbitrum)       │
+  │  ├─ Aave V3 supply / withdraw       │
+  │  └─ LLM decision + audit log        │
+  │                                     │
+  │  PaymentEngine (x402)               │
+  │  ├─ WDK wallet-evm (Plasma)         │
+  │  ├─ fetchWithPayment (EIP-3009)     │
+  │  └─ ensureLiquidity → Aave withdraw │
+  └─────────────────────────────────────┘
+        ↓ paid services
+  Agelo Marketplace (x402 server)
+  ├─ /api/aave-rates       $0.003
+  ├─ /api/financial-report $0.010
+  ├─ /api/market-analysis  $0.010
+  ├─ /api/crypto-price     $0.001
+  └─ /api/ai-inference     $0.050
+```
 
 ---
 
-## Marketplace Services
+## WDK Modules Used
 
-| Endpoint | Price | Description |
-|---|---|---|
-| `GET /api/crypto-price/:symbol` | $0.001 USDT0 | Live crypto price data |
-| `GET /api/news-summary` | $0.005 USDT0 | Crypto news digest + sentiment |
-| `GET /api/market-analysis` | $0.010 USDT0 | AI-powered market analysis |
-| `GET /api/onchain-metrics` | $0.010 USDT0 | On-chain ETH/BTC metrics |
-| `POST /api/ai-inference` | $0.050 USDT0 | General AI inference |
+| Module | Usage |
+|--------|-------|
+| `@tetherto/wdk` | Core orchestrator |
+| `@tetherto/wdk-wallet-evm` | Self-custodial wallets on Plasma + Ethereum + Arbitrum |
+| `@tetherto/wdk-protocol-lending-aave-evm` | Aave V3 supply, withdraw, getAccountData |
+| `@tetherto/wdk-protocol-bridge-usdt0-evm` | USDT bridge (Ethereum → Arbitrum, in roadmap) |
+| `@x402/fetch` + `@x402/express` + `@x402/evm` | x402 client + server payments |
 
 ---
 
-## Quick Start
+## Quickstart
+
+### Prerequisites
+- Node.js 20+
+- Seed phrase with USDT on Arbitrum (for Aave) and USDT0 on Plasma (for x402)
+- Anthropic API key
+
+### Setup
 ```bash
-# Install dependencies
-npm install
-
-# Configure environment
+git clone https://github.com/YOUR_USERNAME/agelo
+cd agelo
 cp .env.example .env
-# Edit .env with your seed phrase and Anthropic API key
-
-# Terminal 1 — start the marketplace
-npm run marketplace
-
-# Terminal 2 — run the agent
-npm run agent "What is the current price of BTC and ETH?"
+# Fill in AGENT_SEED_PHRASE and ANTHROPIC_API_KEY
+npm install
 ```
 
-### Example Output
-```
-🤖 Agelo Agent
-   Wallet: 0xD173...54a6
-   Balance: 0.015000 USDT0
+### Run
 
-📋 Task: What is the current price of BTC and ETH?
-
-  💳 Calling: get_crypto_price
-  ✅ Paid 0.001000 USDT0
-  💳 Calling: get_crypto_price
-  ✅ Paid 0.001000 USDT0
-
-📊 ANSWER
-BTC: $68,420.55 (+1.11%) | ETH: $3,812.33 (+2.53%)
-
-🧾 RECEIPTS
-  1. /api/crypto-price/BTC    $0.001000 USDT0  tx: 0x4f2a...
-  2. /api/crypto-price/ETH    $0.001000 USDT0  tx: 0x8c1b...
-  TOTAL: $0.002000 USDT0
-```
-
----
-
-## Environment Variables
+**Terminal 1 — Services Marketplace:**
 ```bash
-AGENT_SEED_PHRASE="twelve word seed phrase here"
-ANTHROPIC_API_KEY="sk-ant-..."
-PLASMA_RPC="https://rpc.plasma.to"
-PLASMA_NETWORK_ID="eip155:9745"
-USDT0_PLASMA="0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb"
-MARKETPLACE_PORT=4021
-AGENT_PORT=4022
-MOCK_PAYMENTS=false  # set to true for testing without real funds
+npm run marketplace
+```
+
+**Terminal 2 — Agent + API:**
+```bash
+npm start
+```
+
+**Terminal 3 — CLI:**
+```bash
+npm run agent "What is my portfolio status?"
+```
+
+**Dashboard:**  
+Open `src/dashboard/index.html` in browser.
+
+---
+
+## How the Autonomous Loop Works
+```
+Every 30 minutes:
+  1. Read USDT balance (Arbitrum)
+  2. Read Aave position (collateral, APY, health factor)
+  3. Claude Haiku evaluates: supply / withdraw / hold
+  4. Execute transaction if needed
+  5. Log decision with reasoning
+
+On every x402 payment:
+  1. Check liquid USDT0 balance (Plasma)
+  2. If insufficient → withdraw from Aave (Arbitrum)
+  3. Pay via x402 (EIP-3009 signed authorization)
+  4. Redeposit excess above reserve back to Aave
 ```
 
 ---
 
-## WDK Integration
-
-Agelo uses the following Tether WDK modules:
-
-- **`@tetherto/wdk-wallet-evm`** — self-custodial EVM wallet on Plasma
-- **`@tetherto/wdk-protocol-bridge-usdt0-evm`** — bridge USDT → USDT0
-- **`@x402/fetch`** — automatic payment client
-- **`@x402/express`** — payment middleware for service endpoints
-- **`@x402/evm`** — ExactEvmScheme for EIP-3009 signed transfers
+## Project Structure
+```
+src/
+├── wallet/
+│   ├── wdk-setup.ts        # WDK core — Plasma + Ethereum + Arbitrum
+│   └── agent-wallet.ts     # Plasma wallet helpers
+├── services/
+│   ├── lending.ts          # Aave V3 supply/withdraw/position
+│   └── marketplace.ts      # x402 payment-gated API server
+├── agent/
+│   ├── treasury-engine.ts  # Autonomous 30-min yield loop
+│   ├── payment-engine.ts   # x402 client with auto-liquidity
+│   └── agent.ts            # AgeloAgent — LLM + tools
+├── dashboard/
+│   └── index.html          # Real-time portfolio dashboard
+└── index.ts                # HTTP API server (SSE streaming)
+```
 
 ---
 
-## Hackathon
+## Roadmap
 
-Built for **Tether Hackathon Galáctica WDK Edition 1** — Track: Agent Wallets.
-
-[DoraHacks submission](https://dorahacks.io)
+- [ ] Live Aave APY from on-chain UI Data Provider
+- [ ] Multi-chain yield optimization (compare APYs across chains)
+- [ ] USDT bridge automation (Ethereum → Arbitrum via WDK bridge module)
+- [ ] OpenClaw SKILL.md for agent discoverability
+- [ ] SDK for sellers: `createPaywall()` in 3 lines
+- [ ] Tax estimation on yield earnings
+- [ ] Multi-user support
 
 ---
 
-## License
+## Notes
 
-Apache 2.0
+- `getAaveApys()` returns hardcoded approximate rates (March 2026). Live on-chain rates via Aave UI Data Provider are on the roadmap.
+- The bridge module (`wdk-protocol-bridge-usdt0-evm`) is installed and partially integrated. Full automation pending.
+- All x402 payments use `ExactEvmScheme` on Plasma chain with the Semantic facilitator.
