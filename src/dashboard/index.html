@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Agelo — Autonomous Financial Agent</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0f;color:#e2e8f0;font-family:'Courier New',monospace;min-height:100vh}
+header{border-bottom:1px solid #1e1e2e;padding:1rem 2rem;display:flex;align-items:center;gap:1rem}
+.logo{font-size:1.5rem;font-weight:bold;color:#00d4aa}
+.logo span{color:#e2e8f0}
+.tagline{color:#64748b;font-size:0.8rem;margin-left:auto}
+main{max-width:1200px;margin:0 auto;padding:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.card{background:#12121a;border:1px solid #1e1e2e;border-radius:12px;padding:1.5rem}
+.card-title{font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:#64748b;margin-bottom:1rem}
+.full{grid-column:1/-1}
+.metric{display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;font-size:0.85rem}
+.metric:last-child{border-bottom:none}
+.metric-label{color:#94a3b8}
+.metric-value{color:#00d4aa;font-weight:bold}
+.metric-value.yellow{color:#f59e0b}
+.metric-value.white{color:#e2e8f0}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+.stat{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:1rem}
+.stat-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;color:#64748b}
+.stat-value{font-size:1.6rem;font-weight:bold;color:#00d4aa;margin-top:4px}
+.stat-value.small{font-size:1.1rem}
+textarea{width:100%;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;color:#e2e8f0;font-family:inherit;font-size:0.85rem;padding:0.75rem;resize:vertical;min-height:60px;outline:none}
+textarea:focus{border-color:#00d4aa}
+.btn{background:#00d4aa;color:#000;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:inherit;font-weight:bold;font-size:0.8rem;cursor:pointer;margin-top:0.5rem}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.log{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:1rem;min-height:150px;max-height:250px;overflow-y:auto;font-size:0.78rem;line-height:1.6}
+.log .sys{color:#64748b}
+.log .pay{color:#f59e0b}
+.log .ok{color:#10b981}
+.log .ans{color:#e2e8f0}
+.log .err{color:#ef4444}
+.decision{padding:0.6rem 0;border-bottom:1px solid #1e1e2e;font-size:0.78rem}
+.decision:last-child{border-bottom:none}
+.decision .action{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:bold;margin-right:0.5rem}
+.action.supply{background:#10b98122;color:#10b981;border:1px solid #10b98144}
+.action.withdraw{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.action.hold{background:#64748b22;color:#64748b;border:1px solid #64748b44}
+.receipt{padding:0.5rem 0;border-bottom:1px solid #1e1e2e;font-size:0.75rem;display:flex;justify-content:space-between;align-items:flex-start}
+.receipt:last-child{border-bottom:none}
+.receipt-path{color:#94a3b8;flex:1}
+.receipt-amount{color:#10b981;white-space:nowrap;margin-left:1rem}
+.receipt-tx{font-size:0.65rem;color:#64748b;margin-top:2px}
+a{color:#00d4aa;text-decoration:none}
+a:hover{text-decoration:underline}
+.dot{width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block;margin-right:6px}
+.dot.live{background:#00d4aa;box-shadow:0 0 6px #00d4aa;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.empty{color:#64748b;font-size:0.78rem;text-align:center;padding:1rem}
+.presets{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem}
+.preset{background:transparent;border:1px solid #1e1e2e;border-radius:6px;color:#64748b;font-family:inherit;font-size:0.7rem;padding:3px 8px;cursor:pointer}
+.preset:hover{border-color:#00d4aa;color:#00d4aa}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">Ag<span>elo</span></div>
+  <div style="font-size:0.7rem;color:#7c3aed;background:#7c3aed22;border:1px solid #7c3aed44;padding:2px 8px;border-radius:999px;letter-spacing:1px">WDK · x402 · AAVE</div>
+  <div class="tagline"><span class="dot live" id="status-dot"></span><span id="status-text">connecting...</span></div>
+</header>
+
+<main>
+  <!-- Portfolio -->
+  <div class="card">
+    <div class="card-title">Portfolio</div>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-label">Liquid USDT</div>
+        <div class="stat-value" id="liquid">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Aave V3 (Arbitrum)</div>
+        <div class="stat-value" id="aave">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Total</div>
+        <div class="stat-value small" id="total">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">APY / Health</div>
+        <div class="stat-value small" id="apy">—</div>
+      </div>
+    </div>
+    <div class="metric"><span class="metric-label">Wallet</span><span class="metric-value white" id="wallet-addr">—</span></div>
+    <div class="metric"><span class="metric-label">Arbitrum</span><span class="metric-value white"><a href="https://arbiscan.io/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6" target="_blank">arbiscan.io ↗</a></span></div>
+    <div class="metric"><span class="metric-label">Plasma</span><span class="metric-value white"><a href="https://plasmascan.to/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6" target="_blank">plasmascan.to ↗</a></span></div>
+  </div>
+
+  <!-- Ask Agent -->
+  <div class="card">
+    <div class="card-title">Ask the Agent</div>
+    <textarea id="task-input" placeholder="e.g. What is my portfolio status and how much am I earning?"></textarea>
+    <div class="presets">
+      <button class="preset" onclick="setTask('What is my portfolio status and yield?')">Portfolio status</button>
+      <button class="preset" onclick="setTask('Get current Aave rates and financial report')">Financial report</button>
+      <button class="preset" onclick="setTask('What is the price of BTC and ETH?')">BTC/ETH price</button>
+      <button class="preset" onclick="setTask('Run a treasury cycle and rebalance if needed')">Run treasury cycle</button>
+    </div>
+    <button class="btn" id="run-btn" onclick="runTask()">▶ Run</button>
+    <div class="log" id="log" style="margin-top:1rem">
+      <div class="sys">→ Agelo ready. Enter a task above.</div>
+    </div>
+  </div>
+
+  <!-- Treasury Decisions -->
+  <div class="card">
+    <div class="card-title">Treasury Decisions</div>
+    <div id="decisions"><div class="empty">No decisions yet</div></div>
+  </div>
+
+  <!-- Payment Receipts -->
+  <div class="card">
+    <div class="card-title">x402 Payment Receipts <span id="total-spent" style="color:#f59e0b;float:right"></span></div>
+    <div id="receipts"><div class="empty">No payments yet</div></div>
+  </div>
+</main>
+
+<script>
+const API = 'http://localhost:4022'
+let allDecisions = []
+let allReceipts  = []
+
+function setTask(t) { document.getElementById('task-input').value = t }
+
+function setStatus(live, text) {
+  document.getElementById('status-dot').className = 'dot' + (live ? ' live' : '')
+  document.getElementById('status-text').textContent = text
+}
+
+function log(text, cls='sys') {
+  const el = document.getElementById('log')
+  const d  = document.createElement('div')
+  d.className = cls; d.textContent = text
+  el.appendChild(d); el.scrollTop = el.scrollHeight
+}
+
+async function loadPortfolio() {
+  try {
+    const res  = await fetch(`${API}/portfolio`)
+    const data = await res.json()
+    document.getElementById('liquid').textContent = '$' + data.liquid_usdt
+    document.getElementById('aave').textContent   = '$' + data.aave_usdt
+    document.getElementById('total').textContent  = '$' + data.total_usdt
+    document.getElementById('apy').textContent    = (data.apy ?? '—') + ' / ' + (data.health_factor ?? '—')
+    document.getElementById('wallet-addr').textContent = '0xD173...54a6'
+    setStatus(true, 'connected')
+
+    if (data.decisions?.length) {
+      allDecisions = data.decisions
+      renderDecisions()
+    }
+  } catch {
+    setStatus(false, 'disconnected — start agent server')
+  }
+}
+
+async function loadReceipts() {
+  try {
+    const res  = await fetch(`${API}/receipts`)
+    const data = await res.json()
+    if (data.items?.length) {
+      allReceipts = data.items
+      renderReceipts(data.total_spent)
+    }
+  } catch {}
+}
+
+function renderDecisions() {
+  const el = document.getElementById('decisions')
+  if (!allDecisions.length) { el.innerHTML = '<div class="empty">No decisions yet</div>'; return }
+  el.innerHTML = [...allDecisions].reverse().slice(0,8).map(d => `
+    <div class="decision">
+      <span class="action ${d.action}">${d.action.toUpperCase()}</span>
+      <span style="color:#94a3b8">${d.amount ? '$' + (Number(d.amount)/1e6).toFixed(2) + ' · ' : ''}${d.reason}</span>
+      ${d.txHash ? `<div class="receipt-tx"><a href="https://arbiscan.io/tx/${d.txHash}" target="_blank">${d.txHash.slice(0,20)}... ↗</a></div>` : ''}
+      <div class="receipt-tx">${new Date(d.timestamp).toLocaleTimeString()}</div>
+    </div>`).join('')
+}
+
+function renderReceipts(total) {
+  const el = document.getElementById('receipts')
+  if (!allReceipts.length) { el.innerHTML = '<div class="empty">No payments yet</div>'; return }
+  document.getElementById('total-spent').textContent = 'Total: $' + total + ' USDT0'
+  el.innerHTML = [...allReceipts].reverse().slice(0,8).map(r => `
+    <div class="receipt">
+      <div>
+        <div class="receipt-path">${r.url.replace('http://localhost:4021','')}</div>
+        ${r.tx_hash ? `<div class="receipt-tx"><a href="https://plasmascan.to/tx/${r.tx_hash}" target="_blank">${r.tx_hash.slice(0,20)}... ↗</a></div>` : ''}
+      </div>
+      <div class="receipt-amount">$${r.amount_usdt}</div>
+    </div>`).join('')
+}
+
+async function runTask() {
+  const task = document.getElementById('task-input').value.trim()
+  if (!task) return
+  const btn = document.getElementById('run-btn')
+  btn.disabled = true
+  document.getElementById('log').innerHTML = ''
+  log(`→ ${task}`, 'sys')
+  setStatus(true, 'running...')
+
+  try {
+    const res = await fetch(`${API}/task`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ task })
+    })
+    const reader = res.body.getReader()
+    const dec    = new TextDecoder()
+    let buf = ''
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buf += dec.decode(value, { stream: true })
+      for (const line of buf.split('\n')) {
+        if (!line.startsWith('data:')) continue
+        try {
+          const evt = JSON.parse(line.slice(5).trim())
+          if (evt.text)  { log('', 'sys'); log('ANSWER:', 'sys'); log(evt.text, 'ans') }
+          if (evt.items && evt.total_spent !== undefined) {
+            allReceipts = [...allReceipts, ...evt.items]
+            renderReceipts(evt.total_spent)
+          }
+          if (evt.items && evt.total_spent === undefined) {
+            allDecisions = [...allDecisions, ...evt.items]
+            renderDecisions()
+          }
+          if (evt.success) {
+            log('✓ Done', 'ok')
+            setStatus(true, 'connected')
+            loadPortfolio()
+          }
+          if (evt.message) log('✗ ' + evt.message, 'err')
+        } catch {}
+      }
+      buf = buf.split('\n').pop() ?? ''
+    }
+  } catch (e) {
+    log('✗ ' + e.message, 'err')
+    setStatus(false, 'error')
+  }
+  btn.disabled = false
+}
+
+document.getElementById('task-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) runTask()
+})
+
+loadPortfolio()
+loadReceipts()
+setInterval(loadPortfolio, 15000)
+</script>
+</body>
+</html>
