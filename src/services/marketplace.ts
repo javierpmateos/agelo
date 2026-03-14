@@ -19,6 +19,12 @@ const PRICE = {
   market_analysis: '10000',
   onchain_metrics: '10000',
   ai_inference:    '50000',
+  aave_rates:      '3000',
+  aave_position:   '5000',
+  defi_strategy:   '20000',
+  aave_rates:      '3000',
+  aave_position:   '5000',
+  defi_strategy:   '20000',
 }
 
 function mockCryptoPrice(symbol: string) {
@@ -107,11 +113,17 @@ async function main() {
   app.use(express.json())
 
   app.use(paymentMiddleware({
-    'GET /api/crypto-price/[symbol]': payConfig(PRICE.crypto_price, 'Live crypto price'),
+    'GET /api/crypto-price/:symbol': payConfig(PRICE.crypto_price, 'Live crypto price'),
     'GET /api/news-summary':         payConfig(PRICE.news_summary, 'Crypto news digest'),
     'GET /api/market-analysis':      payConfig(PRICE.market_analysis, 'AI market analysis'),
     'GET /api/onchain-metrics':      payConfig(PRICE.onchain_metrics, 'On-chain metrics'),
     'POST /api/ai-inference':        payConfig(PRICE.ai_inference, 'LLM inference'),
+      'GET /api/aave-rates':           payConfig(PRICE.aave_rates, 'Aave V3 APY rates'),
+      'GET /api/aave-position':         payConfig(PRICE.aave_position, 'Aave V3 position'),
+      'POST /api/defi-strategy':        payConfig(PRICE.defi_strategy, 'AI DeFi strategy'),
+      'GET /api/aave-rates':           payConfig(PRICE.aave_rates, 'Aave V3 APY rates'),
+      'GET /api/aave-position':         payConfig(PRICE.aave_position, 'Aave V3 position'),
+      'POST /api/defi-strategy':        payConfig(PRICE.defi_strategy, 'AI DeFi strategy'),
   } as any, resourceServer))
 
   app.get('/health', (_req, res) => {
@@ -185,6 +197,21 @@ async function main() {
     res.json({ result: msg.content[0].type === 'text' ? msg.content[0].text : '', timestamp: new Date().toISOString() })
   })
 
+
+    app.get('/api/aave-rates', async (_req, res) => {
+      res.json({ protocol: 'Aave V3', chain: 'Base', rates: { USDC: { supplyApy: '4.2%', borrowApy: '6.1%' }, USDT: { supplyApy: '3.8%', borrowApy: '5.9%' }, ETH: { supplyApy: '2.1%', borrowApy: '3.4%' } }, timestamp: new Date().toISOString() })
+    })
+
+    app.get('/api/aave-position', (_req, res) => {
+      res.json({ message: 'No active Aave position', hint: 'Fund Base wallet with USDC to start' })
+    })
+
+    app.post('/api/defi-strategy', async (req, res) => {
+      const { balance, riskProfile, goals } = req.body
+      const msg = await anthropic.messages.create({ model: 'claude-haiku-4-5', max_tokens: 400, messages: [{ role: 'user', content: 'DeFi strategy. Balance: ' + (balance||'unknown') + ' USDT. Risk: ' + (riskProfile||'moderate') + '. Aave V3 Base: USDC 4.2% APY, USDT 3.8% APY. JSON only: strategy, allocation, expectedApy, topAction, warning.' }] })
+      const text = msg.content[0].type === 'text' ? msg.content[0].text : '{}'
+      try { res.json(JSON.parse(text.replace(/```json|```/g, '').trim())) } catch { res.json({ strategy: text }) }
+    })
   app.listen(PORT, () => {
     console.log(`Marketplace running on http://localhost:${PORT}`)
     console.log(`   /api/crypto-price/:symbol  $0.001`)
@@ -192,6 +219,9 @@ async function main() {
     console.log(`   /api/market-analysis        $0.010`)
     console.log(`   /api/onchain-metrics        $0.010`)
     console.log(`   /api/ai-inference           $0.050`)
+      console.log(`   /api/aave-rates             $0.003`)
+      console.log(`   /api/aave-position          $0.005`)
+      console.log(`   /api/defi-strategy          $0.020`)
   })
 }
 

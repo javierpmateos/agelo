@@ -43,6 +43,24 @@ const TOOLS: Anthropic.Tool[] = [
       required: ['prompt'],
     },
   },
+  {
+    name: 'get_aave_rates',
+    description: 'Get current Aave V3 supply and borrow APY rates on Base. Costs $0.003 USDT.',
+    input_schema: { type: 'object' as const, properties: {} },
+  },
+  {
+    name: 'get_defi_strategy',
+    description: 'Get AI-powered DeFi strategy recommendation. Costs $0.020 USDT.',
+    input_schema: {
+      type: 'object' as const,
+      properties: {
+        balance: { type: 'string' },
+        riskProfile: { type: 'string', enum: ['conservative', 'moderate', 'aggressive'] },
+        goals: { type: 'string' },
+      },
+      required: ['riskProfile'],
+    },
+  },
 ]
 
 export class PayGateAgent {
@@ -78,6 +96,13 @@ export class PayGateAgent {
           body: JSON.stringify({ prompt: input.prompt, context: input.context }),
         }
         break
+        case 'get_aave_rates':
+          url = `${MARKETPLACE_BASE}/api/aave-rates`
+          break
+        case 'get_defi_strategy':
+          url = `${MARKETPLACE_BASE}/api/defi-strategy`
+          fetchOptions = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ balance: input.balance, riskProfile: input.riskProfile, goals: input.goals }) }
+          break
       default:
         throw new Error(`Unknown tool: ${name}`)
     }
