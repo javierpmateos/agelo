@@ -38,3 +38,26 @@ export async function createFacilitatorWallet(seedPhrase: string) {
   const manager = new WalletManagerEvm(seedPhrase, { provider: PLASMA_RPC })
   return manager.getAccount()
 }
+
+export async function getAgentAddress(): Promise<string> {
+  const seed = process.env.AGENT_SEED_PHRASE
+  if (!seed) throw new Error('AGENT_SEED_PHRASE not set')
+  const { createAgentWallet } = await import('./agent-wallet.js')
+  const w = await createAgentWallet(seed)
+  return w.address
+}
+
+export async function getUSDT0Balance(address: string): Promise<string> {
+  const seed = process.env.AGENT_SEED_PHRASE
+  if (!seed) throw new Error('AGENT_SEED_PHRASE not set')
+  const { createAgentWallet } = await import('./agent-wallet.js')
+  const w = await createAgentWallet(seed)
+  return w.getUsdtBalance()
+}
+
+export async function getBaseWalletInfo() {
+  const { getBaseAccount } = await import('./wdk-setup.js')
+  const account = await getBaseAccount(0)
+  const address = await account.getAddress()
+  return { address }
+}

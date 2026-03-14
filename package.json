@@ -1,5 +1,5 @@
 {
-  "name": "paygate",
+  "name": "agelo",
   "version": "1.0.0",
   "description": "Autonomous AI agent that pays for services via x402 using Tether WDK",
   "type": "module",
