@@ -48,7 +48,7 @@ export function createX402Client(wallet: AgentWallet) {
     const res = await fetchWithPayment(url, options)
 
     let receipt: PaymentReceipt | null = null
-    const paymentHeader = res.headers.get('X-PAYMENT-RESPONSE')
+    const paymentHeader = res.headers.get('payment-response') || res.headers.get('X-PAYMENT-RESPONSE')
     if (paymentHeader) {
       try {
         const parsed = JSON.parse(paymentHeader)

@@ -107,7 +107,7 @@ async function main() {
   app.use(express.json())
 
   app.use(paymentMiddleware({
-    'GET /api/crypto-price/:symbol': payConfig(PRICE.crypto_price, 'Live crypto price'),
+    'GET /api/crypto-price/[symbol]': payConfig(PRICE.crypto_price, 'Live crypto price'),
     'GET /api/news-summary':         payConfig(PRICE.news_summary, 'Crypto news digest'),
     'GET /api/market-analysis':      payConfig(PRICE.market_analysis, 'AI market analysis'),
     'GET /api/onchain-metrics':      payConfig(PRICE.onchain_metrics, 'On-chain metrics'),
