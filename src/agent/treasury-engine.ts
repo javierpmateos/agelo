@@ -165,7 +165,8 @@ Respond with JSON only:
         aaveBalance:   state.aaveHuman,
         apy:           state.apys.USDT?.supplyApy,
       }
-    } catch {
+    } catch (llmErr: any) {
+      console.warn('⚠️  LLM unavailable, using deterministic fallback rules:', llmErr?.message)
       // Fallback: reglas deterministas si el LLM falla
       if (idleAboveReserve >= this.config.minDepositAmount && usdtApy >= this.config.minApy) {
         return {
