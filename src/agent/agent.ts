@@ -80,12 +80,12 @@ export class AgeloAgent {
       }
 
       case 'get_aave_rates': {
-        const { data } = await this.payments.negotiatedFetch('aave-rates')
+        const { data } = await this.payments.smartFetch('aave-rates', `${MARKETPLACE}/api/aave-rates`)
         return JSON.stringify(data)
       }
 
       case 'get_financial_report': {
-        const { data } = await this.payments.negotiatedFetch('financial-report')
+        const { data } = await this.payments.smartFetch('financial-report', `${MARKETPLACE}/api/financial-report`)
         return JSON.stringify(data)
       }
 
