@@ -9,6 +9,20 @@ import { getAaveApys, getAavePosition } from '../services/lending.js'
 import 'dotenv/config'
 
 const PORT = Number(process.env.MARKETPLACE_PORT ?? 4021)
+
+// ─── Seller Income Tracker ────────────────────────────────────────────────────
+export interface IncomeRecord {
+  endpoint:   string
+  amount_usdt: string
+  timestamp:  string
+  payer?:     string
+}
+const incomeLog: IncomeRecord[] = []
+
+export function getIncomeLog() { return [...incomeLog] }
+export function getTotalIncome(): string {
+  return incomeLog.reduce((acc, r) => acc + Number(r.amount_usdt), 0).toFixed(6)
+}
 const PLASMA_RPC = process.env.PLASMA_RPC ?? 'https://rpc.plasma.to'
 const PLASMA_NETWORK_ID = (process.env.PLASMA_NETWORK_ID ?? 'eip155:9745') as `${string}:${string}`
 const USDT0_PLASMA = process.env.USDT0_PLASMA ?? '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb'
@@ -174,6 +188,18 @@ async function main() {
       report: msg.content[0].type === 'text' ? msg.content[0].text : '',
       raw: { position, rates },
       timestamp: new Date().toISOString(),
+    })
+  })
+
+  // Seller income endpoint — free, no payment required
+  app.get('/seller/income', (_req, res) => {
+    res.json({
+      records:       getIncomeLog(),
+      total_income:  getTotalIncome(),
+      endpoint_breakdown: incomeLog.reduce((acc: Record<string, number>, r) => {
+        acc[r.endpoint] = (acc[r.endpoint] ?? 0) + Number(r.amount_usdt)
+        return acc
+      }, {}),
     })
   })
 

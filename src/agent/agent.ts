@@ -193,4 +193,7 @@ async function main() {
   }
 }
 
-main().catch(console.error)
+// Only run CLI when executed directly, not when imported
+if (process.argv[1]?.endsWith('agent.ts') || process.argv[1]?.endsWith('agent.js')) {
+  main().catch(console.error)
+}
