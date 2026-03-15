@@ -4,134 +4,274 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Agelo — Autonomous Financial Agent</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0a0f;color:#e2e8f0;font-family:'Courier New',monospace;min-height:100vh}
 header{border-bottom:1px solid #1e1e2e;padding:1rem 2rem;display:flex;align-items:center;gap:1rem}
 .logo{font-size:1.5rem;font-weight:bold;color:#00d4aa}
 .logo span{color:#e2e8f0}
-.tagline{color:#64748b;font-size:0.8rem;margin-left:auto}
-main{max-width:1200px;margin:0 auto;padding:2rem;display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.card{background:#12121a;border:1px solid #1e1e2e;border-radius:12px;padding:1.5rem}
-.card-title{font-size:0.65rem;text-transform:uppercase;letter-spacing:2px;color:#64748b;margin-bottom:1rem}
-.full{grid-column:1/-1}
-.metric{display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;font-size:0.85rem}
-.metric:last-child{border-bottom:none}
-.metric-label{color:#94a3b8}
-.metric-value{color:#00d4aa;font-weight:bold}
-.metric-value.yellow{color:#f59e0b}
-.metric-value.white{color:#e2e8f0}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
-.stat{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:1rem}
-.stat-label{font-size:0.6rem;text-transform:uppercase;letter-spacing:1px;color:#64748b}
-.stat-value{font-size:1.6rem;font-weight:bold;color:#00d4aa;margin-top:4px}
-.stat-value.small{font-size:1.1rem}
-textarea{width:100%;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;color:#e2e8f0;font-family:inherit;font-size:0.85rem;padding:0.75rem;resize:vertical;min-height:60px;outline:none}
-textarea:focus{border-color:#00d4aa}
-.btn{background:#00d4aa;color:#000;border:none;border-radius:8px;padding:0.6rem 1.2rem;font-family:inherit;font-weight:bold;font-size:0.8rem;cursor:pointer;margin-top:0.5rem}
-.btn:disabled{opacity:0.4;cursor:not-allowed}
-.log{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:1rem;min-height:150px;max-height:250px;overflow-y:auto;font-size:0.78rem;line-height:1.6}
-.log .sys{color:#64748b}
-.log .pay{color:#f59e0b}
-.log .ok{color:#10b981}
-.log .ans{color:#e2e8f0}
-.log .err{color:#ef4444}
-.decision{padding:0.6rem 0;border-bottom:1px solid #1e1e2e;font-size:0.78rem}
-.decision:last-child{border-bottom:none}
-.decision .action{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.65rem;font-weight:bold;margin-right:0.5rem}
-.action.supply{background:#10b98122;color:#10b981;border:1px solid #10b98144}
-.action.withdraw{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
-.action.hold{background:#64748b22;color:#64748b;border:1px solid #64748b44}
-.receipt{padding:0.5rem 0;border-bottom:1px solid #1e1e2e;font-size:0.75rem;display:flex;justify-content:space-between;align-items:flex-start}
-.receipt:last-child{border-bottom:none}
-.receipt-path{color:#94a3b8;flex:1}
-.receipt-amount{color:#10b981;white-space:nowrap;margin-left:1rem}
-.receipt-tx{font-size:0.65rem;color:#64748b;margin-top:2px}
-a{color:#00d4aa;text-decoration:none}
-a:hover{text-decoration:underline}
-.dot{width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block;margin-right:6px}
+.badge{background:#7c3aed22;border:1px solid #7c3aed44;color:#7c3aed;font-size:0.65rem;padding:2px 8px;border-radius:999px;letter-spacing:1px}
+.tagline{margin-left:auto;font-size:0.75rem;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:#64748b;display:inline-block}
 .dot.live{background:#00d4aa;box-shadow:0 0 6px #00d4aa;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.empty{color:#64748b;font-size:0.78rem;text-align:center;padding:1rem}
+main{max-width:1400px;margin:0 auto;padding:1.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.card{background:#12121a;border:1px solid #1e1e2e;border-radius:12px;padding:1.25rem}
+.card-title{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:#64748b;margin-bottom:1rem}
+.span2{grid-column:span 2}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
+.stat{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:0.85rem}
+.stat-label{font-size:0.58rem;text-transform:uppercase;letter-spacing:1px;color:#64748b}
+.stat-value{font-size:1.5rem;font-weight:bold;color:#00d4aa;margin-top:3px}
+.stat-value.sm{font-size:1rem}
+.stat-value.yellow{color:#f59e0b}
+.stat-change{font-size:0.65rem;color:#10b981;margin-top:2px}
+.links{margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap}
+.link-btn{background:transparent;border:1px solid #1e1e2e;border-radius:6px;color:#64748b;font-family:inherit;font-size:0.68rem;padding:3px 10px;cursor:pointer;text-decoration:none;display:inline-block}
+.link-btn:hover{border-color:#00d4aa;color:#00d4aa}
+.chart-wrap{position:relative;height:180px}
+.chart-wrap.sm{height:140px}
+textarea{width:100%;background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;color:#e2e8f0;font-family:inherit;font-size:0.82rem;padding:0.65rem;resize:vertical;min-height:56px;outline:none;transition:border-color 0.2s}
+textarea:focus{border-color:#00d4aa}
 .presets{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem}
-.preset{background:transparent;border:1px solid #1e1e2e;border-radius:6px;color:#64748b;font-family:inherit;font-size:0.7rem;padding:3px 8px;cursor:pointer}
+.preset{background:transparent;border:1px solid #1e1e2e;border-radius:6px;color:#64748b;font-family:inherit;font-size:0.68rem;padding:3px 8px;cursor:pointer}
 .preset:hover{border-color:#00d4aa;color:#00d4aa}
+.btn{background:#00d4aa;color:#000;border:none;border-radius:8px;padding:0.55rem 1.1rem;font-family:inherit;font-weight:bold;font-size:0.78rem;cursor:pointer;margin-top:0.5rem}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.log{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:0.85rem;min-height:120px;max-height:200px;overflow-y:auto;font-size:0.75rem;line-height:1.7;margin-top:0.75rem}
+.sys{color:#64748b}.pay{color:#f59e0b}.ok{color:#10b981}.ans{color:#e2e8f0}.err{color:#ef4444}
+.decision{padding:0.55rem 0;border-bottom:1px solid #1e1e2e;font-size:0.75rem}
+.decision:last-child{border-bottom:none}
+.action-tag{display:inline-block;padding:1px 7px;border-radius:4px;font-size:0.6rem;font-weight:bold;margin-right:0.4rem}
+.supply{background:#10b98122;color:#10b981;border:1px solid #10b98144}
+.withdraw{background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44}
+.hold{background:#64748b22;color:#64748b;border:1px solid #64748b44}
+.sub-text{color:#64748b;font-size:0.65rem;margin-top:2px}
+.receipt{display:flex;justify-content:space-between;align-items:flex-start;padding:0.5rem 0;border-bottom:1px solid #1e1e2e;font-size:0.75rem}
+.receipt:last-child{border-bottom:none}
+.receipt-path{color:#94a3b8;flex:1}
+.receipt-amount{color:#10b981;white-space:nowrap;margin-left:0.75rem}
+.receipt-tx{font-size:0.62rem;color:#64748b;margin-top:2px}
+.receipt-tx a,.sub-text a{color:#00d4aa;text-decoration:none}
+.receipt-tx a:hover,.sub-text a:hover{text-decoration:underline}
+.empty{color:#64748b;font-size:0.75rem;text-align:center;padding:1rem 0}
+.total-line{display:flex;justify-content:space-between;padding-top:0.65rem;font-size:0.8rem;font-weight:bold;border-top:1px solid #1e1e2e;margin-top:0.25rem}
+.yield-box{background:linear-gradient(135deg,#00d4aa11,#7c3aed11);border:1px solid #00d4aa33;border-radius:10px;padding:1rem;text-align:center;margin-top:0.75rem}
+.yield-big{font-size:2.2rem;font-weight:bold;color:#00d4aa}
+.yield-label{font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.yield-sub{font-size:0.75rem;color:#94a3b8;margin-top:0.4rem}
 </style>
 </head>
 <body>
 <header>
   <div class="logo">Ag<span>elo</span></div>
-  <div style="font-size:0.7rem;color:#7c3aed;background:#7c3aed22;border:1px solid #7c3aed44;padding:2px 8px;border-radius:999px;letter-spacing:1px">WDK · x402 · AAVE</div>
-  <div class="tagline"><span class="dot live" id="status-dot"></span><span id="status-text">connecting...</span></div>
+  <div class="badge">WDK · x402 · AAVE V3</div>
+  <div class="tagline">
+    <span class="dot" id="status-dot"></span>
+    <span id="status-text">connecting...</span>
+  </div>
 </header>
-
 <main>
-  <!-- Portfolio -->
   <div class="card">
     <div class="card-title">Portfolio</div>
     <div class="stat-grid">
       <div class="stat">
         <div class="stat-label">Liquid USDT</div>
-        <div class="stat-value" id="liquid">—</div>
+        <div class="stat-value" id="stat-liquid">—</div>
+        <div class="stat-change">Arbitrum</div>
       </div>
       <div class="stat">
-        <div class="stat-label">Aave V3 (Arbitrum)</div>
-        <div class="stat-value" id="aave">—</div>
+        <div class="stat-label">Aave V3 (Arb)</div>
+        <div class="stat-value" id="stat-aave">—</div>
+        <div class="stat-change" id="stat-apy-label">Loading APY...</div>
       </div>
       <div class="stat">
-        <div class="stat-label">Total</div>
-        <div class="stat-value small" id="total">—</div>
+        <div class="stat-label">Total Assets</div>
+        <div class="stat-value sm" id="stat-total">—</div>
       </div>
       <div class="stat">
-        <div class="stat-label">APY / Health</div>
-        <div class="stat-value small" id="apy">—</div>
+        <div class="stat-label">Health Factor</div>
+        <div class="stat-value sm yellow" id="stat-health">—</div>
       </div>
     </div>
-    <div class="metric"><span class="metric-label">Wallet</span><span class="metric-value white" id="wallet-addr">—</span></div>
-    <div class="metric"><span class="metric-label">Arbitrum</span><span class="metric-value white"><a href="https://arbiscan.io/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6" target="_blank">arbiscan.io ↗</a></span></div>
-    <div class="metric"><span class="metric-label">Plasma</span><span class="metric-value white"><a href="https://plasmascan.to/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6" target="_blank">plasmascan.to ↗</a></span></div>
+    <div class="links">
+      <a class="link-btn" href="https://arbiscan.io/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6" target="_blank">Arbiscan ↗</a>
+      <a class="link-btn" href="https://plasmascan.to/address/0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6" target="_blank">Plasmascan ↗</a>
+      <a class="link-btn" href="https://arbiscan.io/tx/0xee856de38ac3b1dd78f400b35affee1eb2a6659e48ec51e490f60e9227fb8b80" target="_blank">Supply TX ↗</a>
+    </div>
   </div>
-
-  <!-- Ask Agent -->
+  <div class="card">
+    <div class="card-title">Yield Analysis</div>
+    <div class="yield-box">
+      <div class="yield-big" id="yield-annual">—</div>
+      <div class="yield-label">Estimated Annual Yield</div>
+      <div class="yield-sub" id="yield-daily">— daily · — monthly</div>
+    </div>
+    <div style="margin-top:0.85rem;font-size:0.72rem;color:#64748b;line-height:1.9">
+      <div style="display:flex;justify-content:space-between"><span>APY</span><span style="color:#00d4aa" id="info-apy">—</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Deployed in Aave</span><span style="color:#e2e8f0" id="info-deployed">—</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Idle (reserved)</span><span style="color:#f59e0b" id="info-idle">—</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Protocol</span><span style="color:#e2e8f0">Aave V3 · Arbitrum</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Allocation</div>
+    <div class="chart-wrap sm"><canvas id="pieChart"></canvas></div>
+    <div style="margin-top:0.75rem;font-size:0.72rem">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+        <div style="width:10px;height:10px;border-radius:2px;background:#00d4aa"></div>
+        <span style="color:#94a3b8">Aave V3 (earning)</span>
+        <span style="color:#00d4aa;margin-left:auto" id="pie-aave-pct">—%</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:10px;height:10px;border-radius:2px;background:#f59e0b"></div>
+        <span style="color:#94a3b8">Liquid reserve</span>
+        <span style="color:#f59e0b;margin-left:auto" id="pie-liquid-pct">—%</span>
+      </div>
+    </div>
+  </div>
+  <div class="card span2">
+    <div class="card-title">Balance History (Session)</div>
+    <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+  </div>
   <div class="card">
     <div class="card-title">Ask the Agent</div>
-    <textarea id="task-input" placeholder="e.g. What is my portfolio status and how much am I earning?"></textarea>
+    <textarea id="task-input" placeholder="e.g. What is my portfolio status?"></textarea>
     <div class="presets">
-      <button class="preset" onclick="setTask('What is my portfolio status and yield?')">Portfolio status</button>
-      <button class="preset" onclick="setTask('Get current Aave rates and financial report')">Financial report</button>
-      <button class="preset" onclick="setTask('What is the price of BTC and ETH?')">BTC/ETH price</button>
-      <button class="preset" onclick="setTask('Run a treasury cycle and rebalance if needed')">Run treasury cycle</button>
+      <button class="preset" onclick="setTask('What is my portfolio status and yield?')">Portfolio</button>
+      <button class="preset" onclick="setTask('Get current Aave rates and financial report')">Report</button>
+      <button class="preset" onclick="setTask('What is the price of BTC and ETH?')">Prices</button>
+      <button class="preset" onclick="setTask('Run a treasury cycle')">Rebalance</button>
     </div>
     <button class="btn" id="run-btn" onclick="runTask()">▶ Run</button>
-    <div class="log" id="log" style="margin-top:1rem">
-      <div class="sys">→ Agelo ready. Enter a task above.</div>
-    </div>
+    <div class="log" id="log"><div class="sys">→ Agelo ready.</div></div>
   </div>
-
-  <!-- Treasury Decisions -->
-  <div class="card">
-    <div class="card-title">Treasury Decisions</div>
-    <div id="decisions"><div class="empty">No decisions yet</div></div>
+  <div class="card span2">
+    <div class="card-title">Treasury Decisions (Autonomous Loop)</div>
+    <div id="decisions"><div class="empty">No decisions yet — treasury cycle runs every 30 min</div></div>
   </div>
-
-  <!-- Payment Receipts -->
   <div class="card">
-    <div class="card-title">x402 Payment Receipts <span id="total-spent" style="color:#f59e0b;float:right"></span></div>
+    <div class="card-title">x402 Payments <span id="total-spent" style="color:#f59e0b;float:right;font-size:0.7rem"></span></div>
     <div id="receipts"><div class="empty">No payments yet</div></div>
   </div>
 </main>
-
+EOFcat >> ~/agelo/src/dashboard/index.html << 'EOF'
 <script>
 const API = 'http://localhost:4022'
-let allDecisions = []
-let allReceipts  = []
+let allDecisions = [], allReceipts = [], balanceHistory = []
+let pieChart, lineChart
 
-function setTask(t) { document.getElementById('task-input').value = t }
+function initCharts() {
+  const base = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
+  pieChart = new Chart(document.getElementById('pieChart'), {
+    type:'doughnut',
+    data:{ labels:['Aave V3','Liquid'], datasets:[{ data:[0,0], backgroundColor:['#00d4aa','#f59e0b'], borderWidth:0, hoverOffset:4 }] },
+    options:{ ...base, cutout:'65%' }
+  })
+  lineChart = new Chart(document.getElementById('lineChart'), {
+    type:'line',
+    data:{ labels:[], datasets:[
+      { label:'Total', data:[], borderColor:'#00d4aa', backgroundColor:'#00d4aa18', fill:true, tension:0.4, pointRadius:3 },
+      { label:'Aave',  data:[], borderColor:'#7c3aed', backgroundColor:'transparent', tension:0.4, pointRadius:3 },
+    ]},
+    options:{ ...base,
+      plugins:{ legend:{ display:true, labels:{ color:'#64748b', font:{ size:10 } } } },
+      scales:{
+        x:{ ticks:{ color:'#64748b', font:{ size:9 } }, grid:{ color:'#1e1e2e' } },
+        y:{ ticks:{ color:'#64748b', font:{ size:9 } }, grid:{ color:'#1e1e2e' } }
+      }
+    }
+  })
+}
+
+function updateCharts(liquid, aave) {
+  const total = liquid + aave
+  const aavePct = total > 0 ? ((aave/total)*100).toFixed(1) : 0
+  const liqPct  = total > 0 ? ((liquid/total)*100).toFixed(1) : 0
+  pieChart.data.datasets[0].data = [aave, liquid]
+  pieChart.update()
+  document.getElementById('pie-aave-pct').textContent   = aavePct + '%'
+  document.getElementById('pie-liquid-pct').textContent = liqPct  + '%'
+  const now = new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' })
+  balanceHistory.push({ time:now, total, aave })
+  if (balanceHistory.length > 20) balanceHistory.shift()
+  lineChart.data.labels           = balanceHistory.map(b => b.time)
+  lineChart.data.datasets[0].data = balanceHistory.map(b => b.total.toFixed(2))
+  lineChart.data.datasets[1].data = balanceHistory.map(b => b.aave.toFixed(2))
+  lineChart.update()
+}
 
 function setStatus(live, text) {
   document.getElementById('status-dot').className = 'dot' + (live ? ' live' : '')
   document.getElementById('status-text').textContent = text
 }
+
+async function loadPortfolio() {
+  try {
+    const res  = await fetch(`${API}/portfolio`)
+    const data = await res.json()
+    const liquid = parseFloat(data.liquid_usdt ?? 0)
+    const aave   = parseFloat(data.aave_usdt   ?? 0)
+    const total  = liquid + aave
+    const apy    = parseFloat(data.apy ?? '0')
+    document.getElementById('stat-liquid').textContent    = '$' + liquid.toFixed(2)
+    document.getElementById('stat-aave').textContent      = '$' + aave.toFixed(2)
+    document.getElementById('stat-total').textContent     = '$' + total.toFixed(2)
+    document.getElementById('stat-health').textContent    = data.health_factor ?? '—'
+    document.getElementById('stat-apy-label').textContent = (data.apy ?? '—') + ' APY'
+    const annualYield  = (aave * apy / 100).toFixed(4)
+    const dailyYield   = (aave * apy / 100 / 365).toFixed(6)
+    const monthlyYield = (aave * apy / 100 / 12).toFixed(4)
+    document.getElementById('yield-annual').textContent   = '$' + annualYield
+    document.getElementById('yield-daily').textContent    = `$${dailyYield} daily · $${monthlyYield} monthly`
+    document.getElementById('info-apy').textContent       = (data.apy ?? '—')
+    document.getElementById('info-deployed').textContent  = '$' + aave.toFixed(2) + ' USDT'
+    document.getElementById('info-idle').textContent      = '$' + liquid.toFixed(2) + ' USDT'
+    updateCharts(liquid, aave)
+    setStatus(true, 'connected')
+    if (data.decisions?.length) { allDecisions = data.decisions; renderDecisions() }
+  } catch { setStatus(false, 'disconnected — run: npm start') }
+}
+
+async function loadReceipts() {
+  try {
+    const res  = await fetch(`${API}/receipts`)
+    const data = await res.json()
+    if (data.items?.length) { allReceipts = data.items; renderReceipts(data.total_spent) }
+  } catch {}
+}
+
+function renderDecisions() {
+  const el = document.getElementById('decisions')
+  if (!allDecisions.length) { el.innerHTML = '<div class="empty">No decisions yet — treasury cycle runs every 30 min</div>'; return }
+  el.innerHTML = [...allDecisions].reverse().slice(0,6).map(d => `
+    <div class="decision">
+      <span class="action-tag ${d.action}">${d.action.toUpperCase()}</span>
+      <span style="color:#94a3b8">${d.amount ? '$'+(Number(d.amount)/1e6).toFixed(2)+' USDT · ' : ''}${d.reason}</span>
+      ${d.txHash ? `<div class="sub-text"><a href="https://arbiscan.io/tx/${d.txHash}" target="_blank">${d.txHash.slice(0,22)}... ↗</a></div>` : ''}
+      <div class="sub-text">${new Date(d.timestamp).toLocaleTimeString()}</div>
+    </div>`).join('')
+}
+
+function renderReceipts(total) {
+  const el = document.getElementById('receipts')
+  if (!allReceipts.length) { el.innerHTML = '<div class="empty">No payments yet</div>'; return }
+  if (total) document.getElementById('total-spent').textContent = 'Total: $' + total
+  el.innerHTML = [...allReceipts].reverse().slice(0,6).map(r => `
+    <div class="receipt">
+      <div>
+        <div class="receipt-path">${r.url.replace('http://localhost:4021','')}</div>
+        ${r.tx_hash ? `<div class="receipt-tx"><a href="https://plasmascan.to/tx/${r.tx_hash}" target="_blank">${r.tx_hash.slice(0,20)}... ↗</a></div>` : ''}
+      </div>
+      <div class="receipt-amount">$${r.amount_usdt}</div>
+    </div>`).join('')
+  if (allReceipts.length > 1) {
+    el.innerHTML += `<div class="total-line"><span>Total spent</span><span style="color:#00d4aa">$${total} USDT0</span></div>`
+  }
+}
+
+function setTask(t) { document.getElementById('task-input').value = t }
 
 function log(text, cls='sys') {
   const el = document.getElementById('log')
@@ -140,112 +280,40 @@ function log(text, cls='sys') {
   el.appendChild(d); el.scrollTop = el.scrollHeight
 }
 
-async function loadPortfolio() {
-  try {
-    const res  = await fetch(`${API}/portfolio`)
-    const data = await res.json()
-    document.getElementById('liquid').textContent = '$' + data.liquid_usdt
-    document.getElementById('aave').textContent   = '$' + data.aave_usdt
-    document.getElementById('total').textContent  = '$' + data.total_usdt
-    document.getElementById('apy').textContent    = (data.apy ?? '—') + ' / ' + (data.health_factor ?? '—')
-    document.getElementById('wallet-addr').textContent = '0xD173...54a6'
-    setStatus(true, 'connected')
-
-    if (data.decisions?.length) {
-      allDecisions = data.decisions
-      renderDecisions()
-    }
-  } catch {
-    setStatus(false, 'disconnected — start agent server')
-  }
-}
-
-async function loadReceipts() {
-  try {
-    const res  = await fetch(`${API}/receipts`)
-    const data = await res.json()
-    if (data.items?.length) {
-      allReceipts = data.items
-      renderReceipts(data.total_spent)
-    }
-  } catch {}
-}
-
-function renderDecisions() {
-  const el = document.getElementById('decisions')
-  if (!allDecisions.length) { el.innerHTML = '<div class="empty">No decisions yet</div>'; return }
-  el.innerHTML = [...allDecisions].reverse().slice(0,8).map(d => `
-    <div class="decision">
-      <span class="action ${d.action}">${d.action.toUpperCase()}</span>
-      <span style="color:#94a3b8">${d.amount ? '$' + (Number(d.amount)/1e6).toFixed(2) + ' · ' : ''}${d.reason}</span>
-      ${d.txHash ? `<div class="receipt-tx"><a href="https://arbiscan.io/tx/${d.txHash}" target="_blank">${d.txHash.slice(0,20)}... ↗</a></div>` : ''}
-      <div class="receipt-tx">${new Date(d.timestamp).toLocaleTimeString()}</div>
-    </div>`).join('')
-}
-
-function renderReceipts(total) {
-  const el = document.getElementById('receipts')
-  if (!allReceipts.length) { el.innerHTML = '<div class="empty">No payments yet</div>'; return }
-  document.getElementById('total-spent').textContent = 'Total: $' + total + ' USDT0'
-  el.innerHTML = [...allReceipts].reverse().slice(0,8).map(r => `
-    <div class="receipt">
-      <div>
-        <div class="receipt-path">${r.url.replace('http://localhost:4021','')}</div>
-        ${r.tx_hash ? `<div class="receipt-tx"><a href="https://plasmascan.to/tx/${r.tx_hash}" target="_blank">${r.tx_hash.slice(0,20)}... ↗</a></div>` : ''}
-      </div>
-      <div class="receipt-amount">$${r.amount_usdt}</div>
-    </div>`).join('')
-}
-
 async function runTask() {
   const task = document.getElementById('task-input').value.trim()
   if (!task) return
   const btn = document.getElementById('run-btn')
   btn.disabled = true
   document.getElementById('log').innerHTML = ''
-  log(`→ ${task}`, 'sys')
+  log('→ ' + task, 'sys')
   setStatus(true, 'running...')
-
   try {
     const res = await fetch(`${API}/task`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task })
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ task })
     })
     const reader = res.body.getReader()
-    const dec    = new TextDecoder()
+    const dec = new TextDecoder()
     let buf = ''
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
-      buf += dec.decode(value, { stream: true })
-      for (const line of buf.split('\n')) {
+      buf += dec.decode(value, { stream:true })
+      const lines = buf.split('\n')
+      buf = lines.pop() ?? ''
+      for (const line of lines) {
         if (!line.startsWith('data:')) continue
         try {
           const evt = JSON.parse(line.slice(5).trim())
-          if (evt.text)  { log('', 'sys'); log('ANSWER:', 'sys'); log(evt.text, 'ans') }
-          if (evt.items && evt.total_spent !== undefined) {
-            allReceipts = [...allReceipts, ...evt.items]
-            renderReceipts(evt.total_spent)
-          }
-          if (evt.items && evt.total_spent === undefined) {
-            allDecisions = [...allDecisions, ...evt.items]
-            renderDecisions()
-          }
-          if (evt.success) {
-            log('✓ Done', 'ok')
-            setStatus(true, 'connected')
-            loadPortfolio()
-          }
-          if (evt.message) log('✗ ' + evt.message, 'err')
+          if (evt.text) { log('','sys'); log('ANSWER:','sys'); evt.text.split('\n').filter(Boolean).forEach(l => log(l,'ans')) }
+          if (evt.items && evt.total_spent !== undefined) { allReceipts = [...allReceipts, ...evt.items]; renderReceipts(evt.total_spent) }
+          if (evt.items && evt.total_spent === undefined) { allDecisions = [...allDecisions, ...evt.items]; renderDecisions() }
+          if (evt.success) { log('✓ Done','ok'); setStatus(true,'connected'); loadPortfolio() }
+          if (evt.message) log('✗ ' + evt.message,'err')
         } catch {}
       }
-      buf = buf.split('\n').pop() ?? ''
     }
-  } catch (e) {
-    log('✗ ' + e.message, 'err')
-    setStatus(false, 'error')
-  }
+  } catch(e) { log('✗ ' + e.message,'err'); setStatus(false,'error') }
   btn.disabled = false
 }
 
@@ -253,6 +321,7 @@ document.getElementById('task-input').addEventListener('keydown', e => {
   if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) runTask()
 })
 
+initCharts()
 loadPortfolio()
 loadReceipts()
 setInterval(loadPortfolio, 15000)
