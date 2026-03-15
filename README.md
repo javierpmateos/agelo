@@ -1,6 +1,6 @@
-# Agelo — Tu USDT nunca duerme
+# Agelo — Your USDT Never Sleeps
 
-> Agente financiero autónomo que maximiza yield en Aave V3, paga servicios vía x402, y reporta todo con IA — construido sobre el stack completo de Tether WDK.
+> Autonomous financial agent that maximizes yield on Aave V3, pays for services via x402, and reports everything with AI — built on the full Tether WDK stack.
 
 **Hackathon:** Tether Hackathon Galáctica: WDK Edition 1  
 **Track:** 🤖 Agent Wallets  
@@ -8,21 +8,19 @@
 
 ---
 
-## ¿Qué hace?
+## What does it do?
 
-Agelo es una alcancía inteligente con tres comportamientos autónomos:
+Agelo is an autonomous financial agent with three core behaviors:
 
-**1. Tu plata rinde mientras no la usás**  
-Detecta USDT idle en tu wallet. Lo deposita en Aave V3 (Arbitrum) automáticamente. Cada 30 minutos evalúa: ¿deposito más? ¿el APY bajó? ¿retiro? — todo con razonamiento de LLM documentado.
+**1. Your USDT earns yield while you sleep**  
+Detects idle USDT in your wallet. Automatically deposits it into Aave V3 (Arbitrum). Every 30 minutes it evaluates: deposit more? APY dropped? Withdraw? — all with documented LLM reasoning.
 
-**2. Cuando hay que pagar, paga sola**  
-Llega un cobro vía x402 (HTTP 402 Payment Required). Agelo verifica si hay suficiente líquido. Si no, retira de Aave exactamente lo necesario, paga en USDT0 en Plasma, y redeposita el sobrante.
+**2. When payment is needed, it pays itself**  
+An x402 charge arrives (HTTP 402 Payment Required). Agelo checks if there is enough liquid balance. If not, it withdraws exactly what is needed from Aave, pays in USDT0 on Plasma, and redeposits the remainder.
 
-**3. Te cuenta cómo te fue**  
-Genera reportes financieros con IA: yield acumulado, gastos por servicio, estado del portfolio, recomendaciones — pagados como servicios x402.
-```
-Builders define the rules → Agents do the work → Value settles onchain
-```
+**3. Reports how you did**  
+Generates AI financial reports: accumulated yield, expenses per service, portfolio status, recommendations — all paid as x402 services.
+> Builders define the rules → Agents do the work → Value settles onchain
 
 ---
 
