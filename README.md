@@ -22,7 +22,7 @@ An x402 charge arrives (HTTP 402 Payment Required). Agelo checks if there is eno
 Generates AI financial reports: accumulated yield, expenses per service, portfolio status, recommendations — all paid as x402 services.
 
 **4. Negotiates before paying**  
-Before purchasing any service, the agent probes multiple providers, compares x402 prices via `ProviderQuote` typed responses, and routes to the cheapest one. Savings are tracked per negotiation and returned as `NegotiationRecord`. Autonomous price negotiation — no human input required.
+Before purchasing any service, the agent probes multiple providers, compares x402 prices via `ProviderQuote` typed responses, and routes to the cheapest one. Savings are tracked per negotiation and returned as `NegotiationRecord`. Autonomous price negotiation — no human input required. **Negotiation is optional** — users can disable it and lock to a preferred provider.
 > Builders define the rules → Agents do the work → Value settles onchain
 
 ---

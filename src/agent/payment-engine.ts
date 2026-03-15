@@ -58,7 +58,10 @@ export class PaymentEngine {
     'http://localhost:4021/api/v2/crypto-price':  '0.001500',
   }
 
-  constructor(private treasury: TreasuryEngine) {}
+  constructor(
+    private treasury: TreasuryEngine,
+    private options: { negotiate: boolean } = { negotiate: true }
+  ) {}
 
   private async getFetchWithPayment() {
     if (this.fetchWithPayment) return this.fetchWithPayment
@@ -190,6 +193,19 @@ export class PaymentEngine {
     const negotiation = await this.negotiate(serviceKey, urlSuffix)
     const { data, receipt } = await this.paidFetch<T>(negotiation.chosen.url, options)
     return { data, receipt, negotiation }
+  }
+
+  // Smart fetch: negotiates if enabled, otherwise pays directly
+  async smartFetch<T = unknown>(
+    serviceKey: string,
+    directUrl:  string,
+    opts:        RequestInit = {}
+  ): Promise<{ data: T; receipt: PaymentReceipt }> {
+    if (this.options.negotiate) {
+      const { data, receipt } = await this.negotiatedFetch<T>(serviceKey, '', opts)
+      return { data, receipt }
+    }
+    return this.paidFetch<T>(directUrl, opts)
   }
 
   getNegotiations()  { return [...this.negotiations] }
