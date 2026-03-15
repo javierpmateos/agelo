@@ -176,7 +176,7 @@ const API = 'http://localhost:4022'
 let allDecisions = [], allReceipts = [], balanceHistory = []
 let pieChart, lineChart
 
-function async function loadSellerIncome() {
+async function loadSellerIncome() {
   try {
     const res  = await fetch('http://localhost:4021/seller/income')
     const data = await res.json()
@@ -203,7 +203,7 @@ function async function loadSellerIncome() {
   } catch {}
 }
 
-initCharts() {
+function initCharts() {
   const base = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
   pieChart = new Chart(document.getElementById('pieChart'), {
     type:'doughnut',
