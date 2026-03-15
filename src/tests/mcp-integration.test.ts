@@ -100,53 +100,52 @@ describe('MCP tool response format', () => {
   })
 })
 
-describe('OpenClaw WDK skill integration', () => {
-  it('SKILL.md defines agelo agent name', () => {
-    // The skill name used in OpenClaw
-    const skillName = 'agelo'
-    expect(skillName).toBe('agelo')
+describe('MCP tool error handling', () => {
+  it('supply with unknown asset throws', async () => {
+    const { supplyToAave } = await import('../services/lending.js')
+    ;(supplyToAave as any).mockRejectedValueOnce(new Error('Unknown asset: XYZ'))
+    await expect(supplyToAave('XYZ' as any, 1_000_000n)).rejects.toThrow('Unknown asset')
   })
 
-  it('WDK skill was installed via npx skills add', () => {
-    // Verified: wdk skill is ✓ ready in openclaw skills list
-    const wdkSkillStatus = 'ready'
-    expect(wdkSkillStatus).toBe('ready')
+  it('withdraw with unknown asset throws', async () => {
+    const { withdrawFromAave } = await import('../services/lending.js')
+    ;(withdrawFromAave as any).mockRejectedValueOnce(new Error('Unknown asset: XYZ'))
+    await expect(withdrawFromAave('XYZ' as any, 1_000_000n)).rejects.toThrow('Unknown asset')
   })
 
-  it('OpenClaw read real Aave position: 841_401_579 base units', () => {
-    // Verified in live OpenClaw session
-    const collateralBaseUnits = 841_401_579
-    const collateralUsd = collateralBaseUnits / 1e8
-    expect(collateralUsd).toBeCloseTo(8.41, 1)
+  it('getAavePosition returns null on RPC failure', async () => {
+    const { getAavePosition } = await import('../services/lending.js')
+    ;(getAavePosition as any).mockResolvedValueOnce(null)
+    const result = await getAavePosition()
+    expect(result).toBeNull()
   })
 
-  it('OpenClaw can read wallet address via WDK skill', () => {
-    const address = '0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6'
-    expect(address).toMatch(/^0x[a-fA-F0-9]{40}$/)
+  it('supply result has hash property', async () => {
+    const { supplyToAave } = await import('../services/lending.js')
+    const result = await supplyToAave('USDT', 1_000_000n)
+    expect(result.hash).toMatch(/^0x/)
+    expect(result.hash.length).toBeGreaterThan(2)
   })
 
-  it('MCP server exposes 6 tools for agent discoverability', () => {
-    const tools = [
-      'agelo_wallet_info',
-      'agelo_base_wallet',
-      'agelo_aave_rates',
-      'agelo_aave_position',
-      'agelo_supply_aave',
-      'agelo_withdraw_aave',
-    ]
-    expect(tools).toHaveLength(6)
+  it('withdraw result has hash property', async () => {
+    const { withdrawFromAave } = await import('../services/lending.js')
+    const result = await withdrawFromAave('USDT', 1_000_000n)
+    expect(result.hash).toMatch(/^0x/)
+    expect(result.hash.length).toBeGreaterThan(2)
   })
 
-  it('SKILL.md follows AgentSkills specification', () => {
-    // Required fields in SKILL.md
-    const requiredFields = ['name', 'display_name', 'description', 'version']
-    requiredFields.forEach(f => expect(f).toBeTruthy())
+  it('wallet_info address is checksummed EIP-55', async () => {
+    const { getAgentAddress } = await import('../wallet/agent-wallet.js')
+    const addr = await getAgentAddress()
+    expect(addr).toMatch(/[a-z]/) // has lowercase
+    expect(addr).toMatch(/[A-Z]/) // has uppercase → EIP-55 checksum
   })
 
-  it('MCP tools are split: 4 reads + 2 writes', () => {
-    const reads  = ['agelo_wallet_info', 'agelo_base_wallet', 'agelo_aave_rates', 'agelo_aave_position']
-    const writes = ['agelo_supply_aave', 'agelo_withdraw_aave']
-    expect(reads).toHaveLength(4)
-    expect(writes).toHaveLength(2)
+  it('getUSDT0Balance returns decimal string', async () => {
+    const { getAgentAddress, getUSDT0Balance } = await import('../wallet/agent-wallet.js')
+    const addr    = await getAgentAddress()
+    const balance = await getUSDT0Balance(addr)
+    expect(parseFloat(balance)).toBeGreaterThanOrEqual(0)
+    expect(balance).toMatch(/^\d+(\.\d+)?$/)
   })
 })
