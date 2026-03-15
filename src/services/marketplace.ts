@@ -225,8 +225,8 @@ async function main() {
   })
 
   app.get('/api/v2/crypto-price/:symbol', async (req, res) => {
-    const symbol = req.params.symbol?.toUpperCase() || 'BTC'
-    res.json({ symbol, price: '0', provider: 'DeFi Hub', timestamp: new Date().toISOString() })
+    const result = await fetchCryptoPrice(req.params.symbol || 'BTC')
+    res.json({ ...result, provider: 'DeFi Hub' })
   })
 
   app.listen(PORT, () => {

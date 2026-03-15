@@ -100,13 +100,15 @@ export class PaymentEngine {
 
   // Precio estimado por endpoint (en sync con marketplace.ts)
   private estimateAmount(url: string): string {
-    if (url.includes('/api/crypto-price'))    return '0.001000'
+    // Check price table first (handles both v1 and v2)
+    for (const [key, price] of Object.entries(this.PRICE_TABLE)) {
+      if (url.startsWith(key)) return price
+    }
+    // Fallback for non-negotiated endpoints
     if (url.includes('/api/news-summary'))     return '0.005000'
     if (url.includes('/api/market-analysis'))  return '0.010000'
     if (url.includes('/api/onchain-metrics'))  return '0.010000'
-    if (url.includes('/api/aave-rates'))       return '0.003000'
     if (url.includes('/api/aave-position'))    return '0.005000'
-    if (url.includes('/api/financial-report')) return '0.010000'
     if (url.includes('/api/defi-strategy'))    return '0.020000'
     if (url.includes('/api/ai-inference'))     return '0.050000'
     return '0.001000'

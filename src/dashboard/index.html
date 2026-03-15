@@ -152,6 +152,10 @@ textarea:focus{border-color:#00d4aa}
     <div id="decisions"><div class="empty">No decisions yet — treasury cycle runs every 30 min</div></div>
   </div>
   <div class="card">
+    <div class="card-title">Price Negotiations <span id="total-saved" style="color:#10b981;float:right;font-size:0.7rem"></span></div>
+    <div id="negotiations"><div class="empty">No negotiations yet</div></div>
+  </div>
+  <div class="card">
     <div class="card-title">x402 Payments <span id="total-spent" style="color:#f59e0b;float:right;font-size:0.7rem"></span></div>
     <div id="receipts"><div class="empty">No payments yet</div></div>
   </div>
@@ -279,8 +283,28 @@ async function loadReceipts() {
   try {
     const res  = await fetch(`${API}/receipts`)
     const data = await res.json()
-    if (data.items?.length) { allReceipts = data.items; renderReceipts(data.total_spent) }
+    if (data.items?.length)        { allReceipts = data.items; renderReceipts(data.total_spent) }
+    if (data.negotiations?.length) { renderNegotiations(data.negotiations, data.total_saved) }
   } catch {}
+}
+
+function renderNegotiations(negotiations, totalSaved) {
+  const el = document.getElementById('negotiations')
+  if (!negotiations?.length) { el.innerHTML = '<div class="empty">No negotiations yet</div>'; return }
+  if (totalSaved) document.getElementById('total-saved').textContent = 'Saved: $' + totalSaved
+  el.innerHTML = [...negotiations].reverse().slice(0, 5).map(n => {
+    const providers = n.providers.map(p => `${p.url.includes('v2') ? 'DeFi Hub' : 'Agelo'} $${p.price}`).join(' vs ')
+    return `<div class="receipt">
+      <div>
+        <div class="receipt-path">${n.service}</div>
+        <div class="receipt-tx">${providers}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="receipt-amount">$${n.chosenPrice}</div>
+        <div style="font-size:0.65rem;color:#10b981">saved $${n.savedVsWorst}</div>
+      </div>
+    </div>`
+  }).join('')
 }
 
 function renderDecisions() {
