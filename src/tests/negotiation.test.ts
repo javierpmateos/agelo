@@ -47,13 +47,13 @@ describe('Provider registry', () => {
   it('v1 URL does not contain v2', () => {
     const engine = makeEngine()
     const v1 = (engine as any).PROVIDERS['aave-rates'][0]
-    expect(v1).not.toContain('v2')
+    expect(v1.url).not.toContain('v2')
   })
 
   it('v2 URL contains v2', () => {
     const engine = makeEngine()
     const v2 = (engine as any).PROVIDERS['aave-rates'][1]
-    expect(v2).toContain('v2')
+    expect(v2.url).toContain('v2')
   })
 })
 
@@ -89,14 +89,14 @@ describe('negotiate()', () => {
   it('returns cheapest provider', async () => {
     const engine = makeEngine()
     const result = await engine.negotiate('aave-rates')
-    expect(result.url).not.toContain('v2')
-    expect(result.price).toBe('0.003000')
+    expect(result.chosen.url).not.toContain('v2')
+    expect(result.chosen.price).toBe('0.003000')
   })
 
   it('chosen price is lower than alternative', async () => {
     const engine = makeEngine()
     const result = await engine.negotiate('financial-report')
-    expect(parseFloat(result.price)).toBeLessThan(0.015)
+    expect(parseFloat(result.chosen.price)).toBeLessThan(0.015)
   })
 
   it('throws for unknown service', async () => {
@@ -117,7 +117,9 @@ describe('negotiate()', () => {
     expect(n).toHaveProperty('service')
     expect(n).toHaveProperty('providers')
     expect(n).toHaveProperty('chosen')
-    expect(n).toHaveProperty('chosenPrice')
+    expect(n.chosen).toHaveProperty('url')
+    expect(n.chosen).toHaveProperty('price')
+    expect(n.chosen).toHaveProperty('name')
     expect(n).toHaveProperty('savedVsWorst')
     expect(n).toHaveProperty('timestamp')
   })

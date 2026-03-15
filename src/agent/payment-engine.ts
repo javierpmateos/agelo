@@ -12,13 +12,19 @@ export interface PaymentReceipt {
   timestamp:   string
 }
 
+export interface ProviderQuote {
+  url:    string
+  price:  string
+  name:   string
+  status: 'available' | 'unavailable'
+}
+
 export interface NegotiationRecord {
-  service:        string
-  providers:      Array<{ url: string; price: string }>
-  chosen:         string
-  chosenPrice:    string
-  savedVsWorst:   string
-  timestamp:      string
+  service:      string
+  providers:    ProviderQuote[]
+  chosen:       ProviderQuote
+  savedVsWorst: string
+  timestamp:    string
 }
 
 export class PaymentEngine {
@@ -27,10 +33,19 @@ export class PaymentEngine {
   private fetchWithPayment: ReturnType<typeof wrapFetchWithPayment> | null = null
 
   // Provider registry: service key → [provider URLs]
-  private readonly PROVIDERS: Record<string, string[]> = {
-    'aave-rates':      ['http://localhost:4021/api/aave-rates',      'http://localhost:4021/api/v2/aave-rates'],
-    'financial-report':['http://localhost:4021/api/financial-report', 'http://localhost:4021/api/v2/financial-report'],
-    'crypto-price':    ['http://localhost:4021/api/crypto-price',     'http://localhost:4021/api/v2/crypto-price'],
+  private readonly PROVIDERS: Record<string, Array<{ url: string; name: string }>> = {
+    'aave-rates':      [
+      { url: 'http://localhost:4021/api/aave-rates',        name: 'Agelo'    },
+      { url: 'http://localhost:4021/api/v2/aave-rates',     name: 'DeFi Hub' },
+    ],
+    'financial-report': [
+      { url: 'http://localhost:4021/api/financial-report',  name: 'Agelo'    },
+      { url: 'http://localhost:4021/api/v2/financial-report', name: 'DeFi Hub' },
+    ],
+    'crypto-price': [
+      { url: 'http://localhost:4021/api/crypto-price',      name: 'Agelo'    },
+      { url: 'http://localhost:4021/api/v2/crypto-price',   name: 'DeFi Hub' },
+    ],
   }
 
   // Known prices per URL (matches paymentMiddleware config)
@@ -128,48 +143,53 @@ export class PaymentEngine {
   }
 
   // Negotiate: find cheapest provider for a service
-  async negotiate(serviceKey: string, urlSuffix = ''): Promise<{ url: string; price: string }> {
-    const providers = this.PROVIDERS[serviceKey]
-    if (!providers) throw new Error(`Unknown service: ${serviceKey}`)
+  async negotiate(serviceKey: string, urlSuffix = ''): Promise<NegotiationRecord> {
+    const providerDefs = this.PROVIDERS[serviceKey]
+    if (!providerDefs) throw new Error(`Unknown service: ${serviceKey}`)
 
-    const options: Array<{ url: string; price: string }> = []
+    const quotes: ProviderQuote[] = []
 
-    for (const baseUrl of providers) {
+    for (const { url: baseUrl, name } of providerDefs) {
       const url   = urlSuffix ? `${baseUrl}/${urlSuffix}` : baseUrl
       const price = await this.probePrice(url)
-      if (price !== null) options.push({ url, price })
+      quotes.push({
+        url, name, price: price ?? '0',
+        status: price !== null ? 'available' : 'unavailable',
+      })
     }
 
-    if (!options.length) throw new Error(`No providers available for: ${serviceKey}`)
+    const available = quotes.filter(q => q.status === 'available')
+    if (!available.length) throw new Error(`No providers available for: ${serviceKey}`)
 
     // Sort by price ascending, pick cheapest
-    options.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
-    const chosen   = options[0]
-    const worstPrice = options[options.length - 1].price
-    const saved    = (parseFloat(worstPrice) - parseFloat(chosen.price)).toFixed(6)
+    available.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
+    const chosen     = available[0]
+    const worstPrice = available[available.length - 1].price
+    const saved      = (parseFloat(worstPrice) - parseFloat(chosen.price)).toFixed(6)
 
-    console.log(`  🔍 Negotiated ${serviceKey}: ${options.map(o => `${o.url.includes('v2') ? 'DeFi Hub' : 'Agelo'} $${o.price}`).join(' vs ')} → chose $${chosen.price} (saved $${saved})`)
+    console.log(`  🔍 Negotiated ${serviceKey}: ${available.map(q => `${q.name} $${q.price}`).join(' vs ')} → chose ${chosen.name} $${chosen.price} (saved $${saved})`)
 
-    this.negotiations.push({
+    const record: NegotiationRecord = {
       service:      serviceKey,
-      providers:    options,
-      chosen:       chosen.url,
-      chosenPrice:  chosen.price,
+      providers:    quotes,
+      chosen,
       savedVsWorst: saved,
       timestamp:    new Date().toISOString(),
-    })
+    }
 
-    return chosen
+    this.negotiations.push(record)
+    return record
   }
 
-  // Negotiate then pay in one step
+  // Negotiate then pay in one step — returns data, receipt, AND negotiation record
   async negotiatedFetch<T = unknown>(
     serviceKey: string,
     urlSuffix  = '',
     options:     RequestInit = {}
-  ): Promise<{ data: T; receipt: PaymentReceipt }> {
-    const { url } = await this.negotiate(serviceKey, urlSuffix)
-    return this.paidFetch<T>(url, options)
+  ): Promise<{ data: T; receipt: PaymentReceipt; negotiation: NegotiationRecord }> {
+    const negotiation = await this.negotiate(serviceKey, urlSuffix)
+    const { data, receipt } = await this.paidFetch<T>(negotiation.chosen.url, options)
+    return { data, receipt, negotiation }
   }
 
   getNegotiations()  { return [...this.negotiations] }
