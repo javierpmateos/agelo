@@ -33,8 +33,10 @@ async function main() {
 
   app.get('/receipts', (_req, res) => {
     res.json({
-      items:       agent.payments.getReceipts(),
-      total_spent: agent.payments.getTotalSpent(),
+      items:        agent.payments.getReceipts(),
+      total_spent:  agent.payments.getTotalSpent(),
+      negotiations: agent.payments.getNegotiations(),
+      total_saved:  agent.payments.getTotalSaved(),
     })
   })
 

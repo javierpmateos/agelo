@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>Agelo — Slides</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0f;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;height:100vh;overflow:hidden}
+.slide{display:none;height:100vh;flex-direction:column;justify-content:center;align-items:center;padding:4rem;text-align:center}
+.slide.active{display:flex}
+.tag{background:#00d4aa22;border:1px solid #00d4aa44;color:#00d4aa;font-size:0.8rem;padding:4px 16px;border-radius:999px;letter-spacing:2px;text-transform:uppercase;margin-bottom:2rem}
+h1{font-size:4.5rem;font-weight:800;letter-spacing:-2px;line-height:1.1;margin-bottom:1rem}
+h1 .accent{color:#00d4aa}
+h2{font-size:2.4rem;font-weight:700;letter-spacing:-1px;margin-bottom:1.5rem}
+.loop{display:flex;align-items:center;gap:1.5rem;margin-top:2rem;flex-wrap:wrap;justify-content:center}
+.loop-item{background:#12121a;border:1px solid #00d4aa44;border-radius:12px;padding:1rem 1.5rem;font-size:0.95rem;color:#e2e8f0}
+.loop-arrow{color:#00d4aa;font-size:1.5rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:2rem;width:100%;max-width:900px}
+.box{background:#12121a;border:1px solid #1e1e2e;border-radius:12px;padding:1.5rem;text-align:left}
+.box-icon{font-size:2rem;margin-bottom:0.5rem}
+.box-title{font-size:1rem;font-weight:700;margin-bottom:0.3rem}
+.box-text{font-size:0.85rem;color:#64748b;line-height:1.5}
+.checks{text-align:left;max-width:600px;margin-top:1.5rem}
+.check{display:flex;align-items:flex-start;gap:0.75rem;padding:0.6rem 0;font-size:1rem;border-bottom:1px solid #1e1e2e}
+.check:last-child{border-bottom:none}
+.arrow{color:#00d4aa;font-size:1rem;margin-top:2px}
+.stack{display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-top:2rem}
+.chip{background:#12121a;border:1px solid #1e1e2e;border-radius:6px;padding:4px 14px;font-size:0.8rem;color:#94a3b8}
+.chip.green{border-color:#00d4aa44;color:#00d4aa}
+.sub{font-size:1rem;color:#64748b;margin-top:0.75rem}
+.nav{position:fixed;bottom:2rem;right:2rem;display:flex;gap:0.75rem}
+.nav button{background:#12121a;border:1px solid #1e1e2e;color:#e2e8f0;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:0.9rem}
+.nav button:hover{border-color:#00d4aa;color:#00d4aa}
+.counter{position:fixed;bottom:2rem;left:2rem;color:#64748b;font-size:0.8rem}
+</style>
+</head>
+<body>
+
+<div class="slide active" id="s1">
+  <div class="tag">🤖 Agent Wallets Track — Tether Hackathon Galáctica</div>
+  <h1>Ag<span class="accent">elo</span></h1>
+  <div style="font-size:1.4rem;color:#94a3b8">An autonomous economic agent with a self-financing loop.</div>
+  <div class="stack">
+    <span class="chip green">Tether WDK</span>
+    <span class="chip green">x402 Payments</span>
+    <span class="chip green">Aave V3 Arbitrum</span>
+    <span class="chip green">OpenClaw + MCP</span>
+    <span class="chip green">Mainnet</span>
+    <span class="chip green">215 Tests</span>
+  </div>
+</div>
+
+<div class="slide" id="s2">
+  <div class="tag">The loop</div>
+  <h2>yield pays for services.<br/>services improve yield.<br/><span style="color:#00d4aa">the protocol pays for itself.</span></h2>
+  <div class="loop">
+    <div class="loop-item">💤 Idle USDT</div>
+    <div class="loop-arrow">→</div>
+    <div class="loop-item">🏦 Aave V3<br/><span style="color:#00d4aa;font-size:0.8rem">earns yield</span></div>
+    <div class="loop-arrow">→</div>
+    <div class="loop-item">💳 x402 payment<br/><span style="color:#00d4aa;font-size:0.8rem">buys services</span></div>
+    <div class="loop-arrow">→</div>
+    <div class="loop-item">🤖 Better decisions<br/><span style="color:#00d4aa;font-size:0.8rem">more yield</span></div>
+  </div>
+  <div class="sub">Nobody else in this hackathon has this closed loop.</div>
+</div>
+
+<div class="slide" id="s3">
+  <div class="tag">Full WDK Stack</div>
+  <h2>Built on Tether WDK — natively.</h2>
+  <div class="grid">
+    <div class="box">
+      <div class="box-icon">🏦</div>
+      <div class="box-title">TreasuryEngine</div>
+      <div class="box-text">Autonomous 30-min loop. Claude Haiku decides: supply / withdraw / hold. Deterministic fallback if LLM fails. Full audit log.</div>
+    </div>
+    <div class="box">
+      <div class="box-icon">💳</div>
+      <div class="box-title">PaymentEngine x402</div>
+      <div class="box-text">HTTP 402 on Plasma chain. ensureLiquidity() withdraws from Aave if needed. Redeposits excess. EIP-3009 signed.</div>
+    </div>
+    <div class="box">
+      <div class="box-icon">🔧</div>
+      <div class="box-title">WDK × 3 chains</div>
+      <div class="box-text">Plasma · Arbitrum · Ethereum. Native wdk-wallet-evm + wdk-protocol-lending-aave-evm. No ethers.js bypass.</div>
+    </div>
+    <div class="box">
+      <div class="box-icon">🤖</div>
+      <div class="box-title">MCP + OpenClaw</div>
+      <div class="box-text">6 tools exposed. WDK skill installed. Live Aave position read by OpenClaw. 215 tests. CI on every push.</div>
+    </div>
+  </div>
+</div>
+
+<div class="slide" id="s4">
+  <div class="tag">Roadmap</div>
+  <h2>What's next</h2>
+  <div class="checks">
+    <div class="check"><span class="arrow">→</span><span><strong>Watchdog Agent</strong> — alerts when health factor drops or APY falls below threshold</span></div>
+    <div class="check"><span class="arrow">→</span><span><strong>Universal SDK</strong> — <code style="color:#00d4aa">createPaywall()</code> in 3 lines for any seller</span></div>
+    <div class="check"><span class="arrow">→</span><span><strong>Multi-protocol yield</strong> — compare Aave vs Compound vs Spark, move to best APY</span></div>
+    <div class="check"><span class="arrow">→</span><span><strong>Railway deploy</strong> — agent running 24/7 in the cloud, zero config</span></div>
+  </div>
+  <div style="margin-top:2.5rem;font-size:1.5rem;font-weight:700;color:#00d4aa">Your USDT never sleeps.</div>
+  <div style="font-size:0.85rem;color:#64748b;margin-top:0.5rem">github.com/javierpmateos/agelo · Apache 2.0</div>
+</div>
+
+<div class="counter" id="counter">1 / 4</div>
+<div class="nav">
+  <button onclick="prev()">← Prev</button>
+  <button onclick="next()">Next →</button>
+</div>
+
+<script>
+let current = 1
+const total = 4
+function show(n) {
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'))
+  document.getElementById('s' + n).classList.add('active')
+  document.getElementById('counter').textContent = n + ' / ' + total
+  current = n
+}
+function next() { if (current < total) show(current + 1) }
+function prev() { if (current > 1) show(current - 1) }
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'Space') next()
+  if (e.key === 'ArrowLeft') prev()
+})
+</script>
+</body>
+</html>

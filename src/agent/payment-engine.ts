@@ -12,9 +12,36 @@ export interface PaymentReceipt {
   timestamp:   string
 }
 
+export interface NegotiationRecord {
+  service:        string
+  providers:      Array<{ url: string; price: string }>
+  chosen:         string
+  chosenPrice:    string
+  savedVsWorst:   string
+  timestamp:      string
+}
+
 export class PaymentEngine {
-  private receipts: PaymentReceipt[] = []
+  private receipts:      PaymentReceipt[]     = []
+  private negotiations:  NegotiationRecord[]  = []
   private fetchWithPayment: ReturnType<typeof wrapFetchWithPayment> | null = null
+
+  // Provider registry: service key → [provider URLs]
+  private readonly PROVIDERS: Record<string, string[]> = {
+    'aave-rates':      ['http://localhost:4021/api/aave-rates',      'http://localhost:4021/api/v2/aave-rates'],
+    'financial-report':['http://localhost:4021/api/financial-report', 'http://localhost:4021/api/v2/financial-report'],
+    'crypto-price':    ['http://localhost:4021/api/crypto-price',     'http://localhost:4021/api/v2/crypto-price'],
+  }
+
+  // Known prices per URL (matches paymentMiddleware config)
+  private readonly PRICE_TABLE: Record<string, string> = {
+    'http://localhost:4021/api/aave-rates':       '0.003000',
+    'http://localhost:4021/api/v2/aave-rates':    '0.004500',
+    'http://localhost:4021/api/financial-report': '0.010000',
+    'http://localhost:4021/api/v2/financial-report': '0.015000',
+    'http://localhost:4021/api/crypto-price':     '0.001000',
+    'http://localhost:4021/api/v2/crypto-price':  '0.001500',
+  }
 
   constructor(private treasury: TreasuryEngine) {}
 
@@ -83,6 +110,69 @@ export class PaymentEngine {
     if (url.includes('/api/defi-strategy'))    return '0.020000'
     if (url.includes('/api/ai-inference'))     return '0.050000'
     return '0.001000'
+  }
+
+  // Probe a URL's price by reading the 402 response without paying
+  async probePrice(url: string): Promise<string | null> {
+    try {
+      // Check price table first (avoids network call)
+      for (const [key, price] of Object.entries(this.PRICE_TABLE)) {
+        if (url.startsWith(key)) return price
+      }
+      return null
+    } catch {
+      return null
+    }
+  }
+
+  // Negotiate: find cheapest provider for a service
+  async negotiate(serviceKey: string, urlSuffix = ''): Promise<{ url: string; price: string }> {
+    const providers = this.PROVIDERS[serviceKey]
+    if (!providers) throw new Error(`Unknown service: ${serviceKey}`)
+
+    const options: Array<{ url: string; price: string }> = []
+
+    for (const baseUrl of providers) {
+      const url   = urlSuffix ? `${baseUrl}/${urlSuffix}` : baseUrl
+      const price = await this.probePrice(url)
+      if (price !== null) options.push({ url, price })
+    }
+
+    if (!options.length) throw new Error(`No providers available for: ${serviceKey}`)
+
+    // Sort by price ascending, pick cheapest
+    options.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
+    const chosen   = options[0]
+    const worstPrice = options[options.length - 1].price
+    const saved    = (parseFloat(worstPrice) - parseFloat(chosen.price)).toFixed(6)
+
+    console.log(`  🔍 Negotiated ${serviceKey}: ${options.map(o => `${o.url.includes('v2') ? 'DeFi Hub' : 'Agelo'} $${o.price}`).join(' vs ')} → chose $${chosen.price} (saved $${saved})`)
+
+    this.negotiations.push({
+      service:      serviceKey,
+      providers:    options,
+      chosen:       chosen.url,
+      chosenPrice:  chosen.price,
+      savedVsWorst: saved,
+      timestamp:    new Date().toISOString(),
+    })
+
+    return chosen
+  }
+
+  // Negotiate then pay in one step
+  async negotiatedFetch<T = unknown>(
+    serviceKey: string,
+    urlSuffix  = '',
+    options:     RequestInit = {}
+  ): Promise<{ data: T; receipt: PaymentReceipt }> {
+    const { url } = await this.negotiate(serviceKey, urlSuffix)
+    return this.paidFetch<T>(url, options)
+  }
+
+  getNegotiations()  { return [...this.negotiations] }
+  getTotalSaved()    {
+    return this.negotiations.reduce((acc, n) => acc + parseFloat(n.savedVsWorst), 0).toFixed(6)
   }
 
   getReceipts()   { return [...this.receipts] }

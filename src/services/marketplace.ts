@@ -28,6 +28,12 @@ const PLASMA_NETWORK_ID = (process.env.PLASMA_NETWORK_ID ?? 'eip155:9745') as `$
 const USDT0_PLASMA = process.env.USDT0_PLASMA ?? '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+const PRICE_V2 = {
+  aave_rates:       '4500',
+  financial_report: '15000',
+  crypto_price:     '1500',
+}
+
 const PRICE = {
   crypto_price:    '1000',
   news_summary:    '5000',
@@ -117,6 +123,10 @@ async function main() {
     'GET /api/aave-position':        payConfig(PRICE.aave_position,   'Aave V3 position'),
     'POST /api/defi-strategy':       payConfig(PRICE.defi_strategy,   'AI DeFi strategy'),
     'GET /api/financial-report':     payConfig(PRICE.financial_report,'AI financial report'),
+    // v2: competitor provider (DeFi Hub) — same data, higher price
+    'GET /api/v2/aave-rates':         payConfig(PRICE_V2.aave_rates,       'Aave V3 APY rates (DeFi Hub)'),
+    'GET /api/v2/financial-report':   payConfig(PRICE_V2.financial_report, 'AI financial report (DeFi Hub)'),
+    'GET /api/v2/crypto-price/:symbol': payConfig(PRICE_V2.crypto_price,   'Crypto price (DeFi Hub)'),
   } as any, resourceServer))
 
   app.get('/health', (_req, res) => {
@@ -201,6 +211,22 @@ async function main() {
         return acc
       }, {}),
     })
+  })
+
+  // ── v2 endpoints (DeFi Hub competitor) ──────────────────────────────────
+  app.get('/api/v2/aave-rates', async (_req, res) => {
+    const rates = await getAaveApys()
+    res.json({ protocol: 'Aave V3', chain: 'Arbitrum', rates, provider: 'DeFi Hub', timestamp: new Date().toISOString() })
+  })
+
+  app.get('/api/v2/financial-report', async (_req, res) => {
+    const [position, apys] = await Promise.all([getAavePosition(), getAaveApys()])
+    res.json({ provider: 'DeFi Hub', position, apys, timestamp: new Date().toISOString() })
+  })
+
+  app.get('/api/v2/crypto-price/:symbol', async (req, res) => {
+    const symbol = req.params.symbol?.toUpperCase() || 'BTC'
+    res.json({ symbol, price: '0', provider: 'DeFi Hub', timestamp: new Date().toISOString() })
   })
 
   app.listen(PORT, () => {
