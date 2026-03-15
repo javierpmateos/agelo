@@ -26,16 +26,26 @@ const PRICE = {
   financial_report:'10000',
 }
 
-function mockCryptoPrice(symbol: string) {
-  const prices: Record<string, number> = {
-    BTC: 68420.55, ETH: 3812.33, SOL: 178.91,
-    USDT: 1.00, BNB: 598.42, ARB: 1.23,
+async function fetchCryptoPrice(symbol: string) {
+  const idMap: Record<string, string> = {
+    BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana',
+    BNB: 'binancecoin', ARB: 'arbitrum', USDT: 'tether',
+    USDC: 'usd-coin', MATIC: 'matic-network',
   }
-  return {
-    symbol: symbol.toUpperCase(),
-    price_usd: prices[symbol.toUpperCase()] ?? Math.random() * 1000,
-    change_24h: (Math.random() * 10 - 5).toFixed(2) + '%',
-    timestamp: new Date().toISOString(),
+  const id = idMap[symbol.toUpperCase()]
+  if (!id) return { symbol: symbol.toUpperCase(), price_usd: 0, change_24h: 'N/A', timestamp: new Date().toISOString(), source: 'unknown' }
+  try {
+    const res  = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd&include_24hr_change=true`)
+    const data = await res.json() as any
+    return {
+      symbol:     symbol.toUpperCase(),
+      price_usd:  data[id]?.usd ?? 0,
+      change_24h: (data[id]?.usd_24h_change ?? 0).toFixed(2) + '%',
+      timestamp:  new Date().toISOString(),
+      source:     'CoinGecko',
+    }
+  } catch {
+    return { symbol: symbol.toUpperCase(), price_usd: 0, change_24h: 'N/A', timestamp: new Date().toISOString(), source: 'error' }
   }
 }
 
@@ -99,8 +109,8 @@ async function main() {
     res.json({ status: 'ok', service: 'Agelo Marketplace', seller: sellerAddress })
   })
 
-  app.get('/api/crypto-price/:symbol', (req, res) => {
-    res.json(mockCryptoPrice(req.params.symbol))
+  app.get('/api/crypto-price/:symbol', async (req, res) => {
+    res.json(await fetchCryptoPrice(req.params.symbol))
   })
 
   app.get('/api/news-summary', (_req, res) => {

@@ -7,7 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0a0a0f;color:#e2e8f0;font-family:'Courier New',monospace;min-height:100vh}
+body{background:#070710;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;min-height:100vh}
 header{border-bottom:1px solid #1e1e2e;padding:1rem 2rem;display:flex;align-items:center;gap:1rem}
 .logo{font-size:1.5rem;font-weight:bold;color:#00d4aa}
 .logo span{color:#e2e8f0}
@@ -17,13 +17,13 @@ header{border-bottom:1px solid #1e1e2e;padding:1rem 2rem;display:flex;align-item
 .dot.live{background:#00d4aa;box-shadow:0 0 6px #00d4aa;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
 main{max-width:1400px;margin:0 auto;padding:1.5rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
-.card{background:#12121a;border:1px solid #1e1e2e;border-radius:12px;padding:1.25rem}
-.card-title{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:#64748b;margin-bottom:1rem}
+.card{background:#0f0f1a;border:1px solid #1e1e2e;border-radius:12px;padding:1.25rem}
+.card-title{font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:#475569;margin-bottom:1rem;font-weight:600}
 .span2{grid-column:span 2}
 .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem}
 .stat{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:0.85rem}
 .stat-label{font-size:0.58rem;text-transform:uppercase;letter-spacing:1px;color:#64748b}
-.stat-value{font-size:1.5rem;font-weight:bold;color:#00d4aa;margin-top:3px}
+.stat-value{font-size:1.6rem;font-weight:700;color:#00d4aa;margin-top:3px;letter-spacing:-0.5px}
 .stat-value.sm{font-size:1rem}
 .stat-value.yellow{color:#f59e0b}
 .stat-change{font-size:0.65rem;color:#10b981;margin-top:2px}
@@ -39,7 +39,7 @@ textarea:focus{border-color:#00d4aa}
 .preset:hover{border-color:#00d4aa;color:#00d4aa}
 .btn{background:#00d4aa;color:#000;border:none;border-radius:8px;padding:0.55rem 1.1rem;font-family:inherit;font-weight:bold;font-size:0.78rem;cursor:pointer;margin-top:0.5rem}
 .btn:disabled{opacity:0.4;cursor:not-allowed}
-.log{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:0.85rem;min-height:120px;max-height:200px;overflow-y:auto;font-size:0.75rem;line-height:1.7;margin-top:0.75rem}
+.log{background:#0a0a0f;border:1px solid #1e1e2e;border-radius:8px;padding:0.85rem;min-height:120px;max-height:200px;overflow-y:auto;font-size:0.75rem;line-height:1.7;margin-top:0.75rem;font-family:'Courier New',monospace}
 .sys{color:#64748b}.pay{color:#f59e0b}.ok{color:#10b981}.ans{color:#e2e8f0}.err{color:#ef4444}
 .decision{padding:0.55rem 0;border-bottom:1px solid #1e1e2e;font-size:0.75rem}
 .decision:last-child{border-bottom:none}
@@ -58,7 +58,7 @@ textarea:focus{border-color:#00d4aa}
 .empty{color:#64748b;font-size:0.75rem;text-align:center;padding:1rem 0}
 .total-line{display:flex;justify-content:space-between;padding-top:0.65rem;font-size:0.8rem;font-weight:bold;border-top:1px solid #1e1e2e;margin-top:0.25rem}
 .yield-box{background:linear-gradient(135deg,#00d4aa11,#7c3aed11);border:1px solid #00d4aa33;border-radius:10px;padding:1rem;text-align:center;margin-top:0.75rem}
-.yield-big{font-size:2.2rem;font-weight:bold;color:#00d4aa}
+.yield-big{font-size:2.4rem;font-weight:800;color:#00d4aa;letter-spacing:-1px}
 .yield-label{font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:2px}
 .yield-sub{font-size:0.75rem;color:#94a3b8;margin-top:0.4rem}
 </style>
