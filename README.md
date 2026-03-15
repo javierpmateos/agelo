@@ -179,6 +179,56 @@ src/
 └── index.ts                # HTTP API server (SSE streaming)
 ```
 
+
+---
+
+## Deploy to Railway (Production)
+
+Run Agelo 24/7 in the cloud with Railway:
+
+### 1. Fork the repo and connect to Railway
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+railway login
+railway init
+```
+
+### 2. Set environment variables in Railway dashboard
+```
+AGENT_SEED_PHRASE=your twelve word seed phrase
+ANTHROPIC_API_KEY=sk-ant-...
+PLASMA_RPC=https://rpc.plasma.to
+PLASMA_NETWORK_ID=eip155:9745
+USDT0_PLASMA=0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb
+MARKETPLACE_PORT=4021
+AGENT_PORT=4022
+```
+
+### 3. Deploy
+```bash
+# Deploy marketplace (x402 server)
+railway up --service marketplace
+
+# Deploy agent API
+railway up --service agent
+```
+
+### 4. Add a `railway.json` config
+```json
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "build": { "builder": "NIXPACKS" },
+  "deploy": {
+    "startCommand": "npm start",
+    "healthcheckPath": "/health",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
+```
+
+> **Note:** Each Railway service maps to one process. Run marketplace and agent as separate services sharing the same environment variables.
+
 ---
 
 ## Roadmap
