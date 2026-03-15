@@ -20,6 +20,9 @@ An x402 charge arrives (HTTP 402 Payment Required). Agelo checks if there is eno
 
 **3. Reports how you did**  
 Generates AI financial reports: accumulated yield, expenses per service, portfolio status, recommendations — all paid as x402 services.
+
+**4. Negotiates before paying**  
+Before purchasing any service, the agent probes multiple providers, compares x402 prices via `ProviderQuote` typed responses, and routes to the cheapest one. Savings are tracked per negotiation and returned as `NegotiationRecord`. Autonomous price negotiation — no human input required.
 > Builders define the rules → Agents do the work → Value settles onchain
 
 ---
@@ -233,6 +236,7 @@ railway up --service agent
 
 ## Roadmap
 
+- [ ] Dynamic negotiation with unknown providers (read price from 402 response in real-time via `extractPriceFrom402Body()`)
 - [ ] Live Aave APY from on-chain UI Data Provider
 - [ ] Multi-chain yield optimization (compare APYs across chains)
 - [ ] USDT bridge automation (Ethereum → Arbitrum via WDK bridge module)
