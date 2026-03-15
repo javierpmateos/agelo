@@ -9,12 +9,12 @@ dotenv.config()
 
 const TOOLS = [
   { name: "agelo_wallet_info",    description: "Get Plasma wallet address and USDT0 balance",          inputSchema: { type: "object", properties: {} } },
-  { name: "agelo_base_wallet",    description: "Get Base wallet address, ETH and USDC balance",        inputSchema: { type: "object", properties: {} } },
-  { name: "agelo_aave_rates",     description: "Get Aave V3 supply/borrow APY rates on Base",         inputSchema: { type: "object", properties: {} } },
+  { name: "agelo_base_wallet",    description: "Get Arbitrum wallet address, ETH and USDT balance",        inputSchema: { type: "object", properties: {} } },
+  { name: "agelo_aave_rates",     description: "Get Aave V3 supply/borrow APY rates on Arbitrum",         inputSchema: { type: "object", properties: {} } },
   { name: "agelo_aave_position",  description: "Get current Aave V3 lending position",                inputSchema: { type: "object", properties: {} } },
-  { name: "agelo_supply_aave",    description: "Supply USDC or USDT to Aave V3 on Base to earn yield",
+  { name: "agelo_supply_aave",    description: "Supply USDT to Aave V3 on Arbitrum to earn yield",
     inputSchema: { type: "object", properties: { asset: { type: "string", enum: ["USDC","USDT"] }, amount: { type: "string" } }, required: ["asset","amount"] } },
-  { name: "agelo_withdraw_aave",  description: "Withdraw from Aave V3 on Base",
+  { name: "agelo_withdraw_aave",  description: "Withdraw from Aave V3 on Arbitrum",
     inputSchema: { type: "object", properties: { asset: { type: "string", enum: ["USDC","USDT"] }, amount: { type: "string" } }, required: ["asset","amount"] } }
 ]
 
@@ -33,11 +33,11 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       }
       case "agelo_base_wallet": {
         const info = await getBaseWalletInfo()
-        return { content: [{ type: "text", text: JSON.stringify({ ...info, chain: "Base", explorer: "https://basescan.org/address/" + info.address }, null, 2) }] }
+        return { content: [{ type: "text", text: JSON.stringify({ ...info, chain: "Arbitrum", explorer: "https://arbiscan.io/address/" + info.address }, null, 2) }] }
       }
       case "agelo_aave_rates": {
         const rates = await getAaveApys()
-        return { content: [{ type: "text", text: JSON.stringify({ protocol: "Aave V3", chain: "Base", rates }, null, 2) }] }
+        return { content: [{ type: "text", text: JSON.stringify({ protocol: "Aave V3", chain: "Arbitrum", rates }, null, 2) }] }
       }
       case "agelo_aave_position": {
         const position = await getAavePosition()

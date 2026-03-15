@@ -159,7 +159,7 @@ async function main() {
 
   app.get('/api/aave-rates', async (_req, res) => {
     const rates = await getAaveApys()
-    res.json({ protocol: 'Aave V3', chain: 'Base', rates, timestamp: new Date().toISOString() })
+    res.json({ protocol: 'Aave V3', chain: 'Arbitrum', rates, timestamp: new Date().toISOString() })
   })
 
   app.get('/api/aave-position', async (_req, res) => {

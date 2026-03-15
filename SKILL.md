@@ -57,7 +57,7 @@ Agelo runs two autonomous loops:
 
 ## Setup
 ```bash
-git clone https://github.com/YOUR_USERNAME/agelo
+git clone https://github.com/javierpmateos/agelo
 cd agelo
 cp .env.example .env
 # Set AGENT_SEED_PHRASE and ANTHROPIC_API_KEY
