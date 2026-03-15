@@ -115,8 +115,31 @@ npm start
 npm run agent "What is my portfolio status?"
 ```
 
-**Dashboard:**  
-Open `src/dashboard/index.html` in browser.
+**Terminal 3 — Dashboard:**
+```bash
+npx serve src/dashboard -p 3000
+# Open http://localhost:3000
+```
+
+---
+
+## MCP Server (OpenClaw / Claude Desktop)
+```bash
+npm run mcp
+```
+
+Exposes 6 tools for any MCP-compatible agent:
+
+| Tool | Description |
+|------|-------------|
+| `agelo_wallet_info` | Plasma wallet address + USDT0 balance |
+| `agelo_base_wallet` | Arbitrum wallet + balances |
+| `agelo_aave_rates` | Aave V3 APY rates |
+| `agelo_aave_position` | Current lending position |
+| `agelo_supply_aave` | Supply USDT to Aave V3 |
+| `agelo_withdraw_aave` | Withdraw from Aave V3 |
+
+Verified working with OpenClaw + WDK skill: read $8.41 Aave collateral live.
 
 ---
 
@@ -163,7 +186,7 @@ src/
 - [ ] Live Aave APY from on-chain UI Data Provider
 - [ ] Multi-chain yield optimization (compare APYs across chains)
 - [ ] USDT bridge automation (Ethereum → Arbitrum via WDK bridge module)
-- [ ] OpenClaw SKILL.md for agent discoverability
+- [x] OpenClaw SKILL.md — implemented and tested (live Aave position read via WDK skill)
 - [ ] SDK for sellers: `createPaywall()` in 3 lines
 - [ ] Tax estimation on yield earnings
 - [ ] Multi-user support
