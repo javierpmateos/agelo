@@ -182,6 +182,8 @@ src/
 
 ## Deploy to Railway (Production)
 
+> ⚠️ **Experimental** — configuration provided as reference, not tested end-to-end in production.
+
 Run Agelo 24/7 in the cloud with Railway:
 
 ### 1. Fork the repo and connect to Railway
@@ -238,6 +240,18 @@ railway up --service agent
 - [ ] SDK for sellers: `createPaywall()` in 3 lines
 - [ ] Tax estimation on yield earnings
 - [ ] Multi-user support
+
+---
+
+## Third-Party Services & Disclosures
+
+| Service | Usage | License/Terms |
+|---------|-------|---------------|
+| **Anthropic Claude API** (claude-haiku-4-5) | LLM for treasury decisions, financial reports, AI inference endpoint | [Anthropic Terms](https://anthropic.com/legal/terms) |
+| **CoinGecko API** | Real-time crypto prices (free tier, no API key required) | [CoinGecko Terms](https://www.coingecko.com/en/terms) |
+| **SemanticPay** | x402 payment facilitator for Plasma chain — officially recognized in Tether WDK Community Spotlight | [semanticpay.io](https://x402.semanticpay.io) |
+| **Aave V3** | Decentralized lending protocol on Arbitrum | [Aave Terms](https://aave.com) |
+| **Tether WDK** | Self-custodial wallet infrastructure | [Apache 2.0](https://github.com/tetherto/wdk) |
 
 ---
 
