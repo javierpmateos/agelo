@@ -35,15 +35,15 @@ export class PaymentEngine {
   // Provider registry: service key → [provider URLs]
   private readonly PROVIDERS: Record<string, Array<{ url: string; name: string }>> = {
     'aave-rates':      [
-      { url: 'http://localhost:4021/api/aave-rates',        name: 'Agelo'    },
+      { url: 'http://localhost:4021/api/aave-rates',        name: 'DataFeed' },
       { url: 'http://localhost:4021/api/v2/aave-rates',     name: 'DeFi Hub' },
     ],
     'financial-report': [
-      { url: 'http://localhost:4021/api/financial-report',  name: 'Agelo'    },
+      { url: 'http://localhost:4021/api/financial-report',  name: 'DataFeed' },
       { url: 'http://localhost:4021/api/v2/financial-report', name: 'DeFi Hub' },
     ],
     'crypto-price': [
-      { url: 'http://localhost:4021/api/crypto-price',      name: 'Agelo'    },
+      { url: 'http://localhost:4021/api/crypto-price',      name: 'DataFeed' },
       { url: 'http://localhost:4021/api/v2/crypto-price',   name: 'DeFi Hub' },
     ],
   }

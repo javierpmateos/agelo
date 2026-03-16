@@ -293,7 +293,7 @@ function renderNegotiations(negotiations, totalSaved) {
   if (!negotiations?.length) { el.innerHTML = '<div class="empty">No negotiations yet</div>'; return }
   if (totalSaved) document.getElementById('total-saved').textContent = 'Saved: $' + totalSaved
   el.innerHTML = [...negotiations].reverse().slice(0, 5).map(n => {
-    const providers = n.providers.map(p => `${p.url.includes('v2') ? 'DeFi Hub' : 'Agelo'} $${p.price}`).join(' vs ')
+    const providers = n.providers.map(p => `${p.url.includes('v2') ? 'DeFi Hub' : 'DataFeed'} $${p.price}`).join(' vs ')
     return `<div class="receipt">
       <div>
         <div class="receipt-path">${n.service}</div>
