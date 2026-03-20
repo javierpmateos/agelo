@@ -8,7 +8,7 @@
     "agent": "tsx src/agent/agent.ts",
     "start": "tsx src/index.ts",
     "bridge": "tsx src/wallet/bridge.ts",
-    "mcp": "npx ts-node --esm src/mcp/server.ts",
+    "mcp": "tsx src/mcp/server.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"

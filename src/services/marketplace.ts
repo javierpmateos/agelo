@@ -10,19 +10,6 @@ import 'dotenv/config'
 
 const PORT = Number(process.env.MARKETPLACE_PORT ?? 4021)
 
-// ─── Seller Income Tracker ────────────────────────────────────────────────────
-export interface IncomeRecord {
-  endpoint:   string
-  amount_usdt: string
-  timestamp:  string
-  payer?:     string
-}
-const incomeLog: IncomeRecord[] = []
-
-export function getIncomeLog() { return [...incomeLog] }
-export function getTotalIncome(): string {
-  return incomeLog.reduce((acc, r) => acc + Number(r.amount_usdt), 0).toFixed(6)
-}
 const PLASMA_RPC = process.env.PLASMA_RPC ?? 'https://rpc.plasma.to'
 const PLASMA_NETWORK_ID = (process.env.PLASMA_NETWORK_ID ?? 'eip155:9745') as `${string}:${string}`
 const USDT0_PLASMA = process.env.USDT0_PLASMA ?? '0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb'
@@ -201,17 +188,6 @@ async function main() {
     })
   })
 
-  // Seller income endpoint — free, no payment required
-  app.get('/seller/income', (_req, res) => {
-    res.json({
-      records:       getIncomeLog(),
-      total_income:  getTotalIncome(),
-      endpoint_breakdown: incomeLog.reduce((acc: Record<string, number>, r) => {
-        acc[r.endpoint] = (acc[r.endpoint] ?? 0) + Number(r.amount_usdt)
-        return acc
-      }, {}),
-    })
-  })
 
   // ── v2 endpoints (DeFi Hub competitor) ──────────────────────────────────
   app.get('/api/v2/aave-rates', async (_req, res) => {
@@ -227,6 +203,18 @@ async function main() {
   app.get('/api/v2/crypto-price/:symbol', async (req, res) => {
     const result = await fetchCryptoPrice(req.params.symbol || 'BTC')
     res.json({ ...result, provider: 'DeFi Hub' })
+  })
+
+  // Global error handler — prevents Express crash on unhandled async errors
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    console.error('Marketplace error:', err.message)
+    res.status(500).json({ error: 'Internal server error', message: err.message })
+  })
+
+  // Global error handler — prevents Express crash on unhandled async errors
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    console.error('Marketplace error:', err.message)
+    res.status(500).json({ error: 'Internal server error', message: err.message })
   })
 
   app.listen(PORT, () => {
