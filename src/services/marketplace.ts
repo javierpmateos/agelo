@@ -189,7 +189,6 @@ async function main() {
     })
   })
 
-
   // ── v2 endpoints (DeFi Hub competitor) ──────────────────────────────────
   app.get('/api/v2/aave-rates', async (_req, res) => {
     const rates = await getAaveApys()
@@ -211,7 +210,6 @@ async function main() {
     console.error('Marketplace error:', err.message)
     res.status(500).json({ error: 'Internal server error', message: err.message })
   })
-
 
   app.listen(PORT, () => {
     console.log(`\n✅ Agelo Marketplace on http://localhost:${PORT}`)

@@ -1,4 +1,5 @@
 import express from 'express'
+import 'express-async-errors'
 import cors from 'cors'
 import { AgeloAgent } from './agent/agent.js'
 import 'dotenv/config'
@@ -65,6 +66,11 @@ async function main() {
     }
 
     res.end()
+  })
+
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    console.error('Agent API error:', err.message)
+    res.status(500).json({ error: 'Internal server error', message: err.message })
   })
 
   app.listen(PORT, () => {
