@@ -237,6 +237,9 @@ railway up --service agent
 ## Roadmap
 
 - [ ] Dynamic negotiation with unknown providers (read price from 402 response in real-time)
+- [ ] Lightning Network micropayments via WDK-Spark integration (announced Aug 2025 — sub-second x402 on Bitcoin when module ships)
+- [ ] USA₮ support for US-regulated institutional users (architecturally ready — waiting for cross-chain expansion to Arbitrum/Plasma)
+- [ ] XAU₮ (Tether Gold) as treasury diversification asset
 - [ ] Live Aave APY from on-chain UI Data Provider
 - [ ] Multi-chain yield optimization (compare APYs across chains)
 - [ ] USDT bridge automation (Ethereum → Arbitrum via WDK bridge module)
