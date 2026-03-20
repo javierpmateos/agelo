@@ -1,4 +1,5 @@
 import express from 'express'
+import 'express-async-errors'
 import cors from 'cors'
 import { paymentMiddleware, x402ResourceServer } from '@x402/express'
 import { ExactEvmScheme } from '@x402/evm/exact/server'
@@ -205,17 +206,12 @@ async function main() {
     res.json({ ...result, provider: 'DeFi Hub' })
   })
 
-  // Global error handler — prevents Express crash on unhandled async errors
+  // Global error handler — catches async errors via express-async-errors
   app.use((err: any, _req: any, res: any, _next: any) => {
     console.error('Marketplace error:', err.message)
     res.status(500).json({ error: 'Internal server error', message: err.message })
   })
 
-  // Global error handler — prevents Express crash on unhandled async errors
-  app.use((err: any, _req: any, res: any, _next: any) => {
-    console.error('Marketplace error:', err.message)
-    res.status(500).json({ error: 'Internal server error', message: err.message })
-  })
 
   app.listen(PORT, () => {
     console.log(`\n✅ Agelo Marketplace on http://localhost:${PORT}`)
