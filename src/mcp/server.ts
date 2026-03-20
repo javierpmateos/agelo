@@ -45,12 +45,12 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       }
       case "agelo_supply_aave": {
         const { asset, amount } = args as any
-        const result = await supplyToAave(asset, amount)
+        const result = await supplyToAave(asset, BigInt(amount))
         return { content: [{ type: "text", text: JSON.stringify({ success: true, tx: result.hash }, null, 2) }] }
       }
       case "agelo_withdraw_aave": {
         const { asset, amount } = args as any
-        const result = await withdrawFromAave(asset, amount)
+        const result = await withdrawFromAave(asset, BigInt(amount))
         return { content: [{ type: "text", text: JSON.stringify({ success: true, tx: result.hash }, null, 2) }] }
       }
       default: throw new Error("Unknown tool: " + name)
