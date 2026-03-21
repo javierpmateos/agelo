@@ -1,5 +1,6 @@
 import WDK from "@tetherto/wdk"
 import WalletManagerEvm from "@tetherto/wdk-wallet-evm"
+import WalletManagerSpark from "@tetherto/wdk-wallet-spark"
 import * as dotenv from "dotenv"
 dotenv.config()
 
@@ -13,7 +14,8 @@ export async function getWDK() {
     .registerWallet("plasma",   WalletManagerEvm, { provider: process.env.PLASMA_RPC || "https://rpc.plasma.to" })
     .registerWallet("ethereum", WalletManagerEvm, { provider: process.env.ETH_RPC    || "https://eth.drpc.org" })
     .registerWallet("arbitrum", WalletManagerEvm, { provider: process.env.ARB_RPC    || "https://arb1.arbitrum.io/rpc" })
-  console.log("  🔧 WDK initialized (Plasma + Ethereum + Arbitrum)")
+    .registerWallet("spark",    WalletManagerSpark as any, {})
+  console.log("  🔧 WDK initialized (Plasma + Ethereum + Arbitrum + Spark/Lightning)")
   return _wdk
 }
 

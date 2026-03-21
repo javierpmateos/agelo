@@ -76,6 +76,7 @@ User / External Agent
 | Module | Usage |
 |--------|-------|
 | `@tetherto/wdk` | Core orchestrator |
+| `@tetherto/wdk-mcp-toolkit` | Official MCP toolkit (35 tools) — Agelo implements 6 domain-specific treasury tools as a specialized layer |
 | `@tetherto/wdk-wallet-evm` | Self-custodial wallets on Plasma + Ethereum + Arbitrum |
 | `@tetherto/wdk-protocol-lending-aave-evm` | Aave V3 supply, withdraw, getAccountData |
 | `@tetherto/wdk-protocol-bridge-usdt0-evm` | USDT bridge (Ethereum → Arbitrum, in roadmap) |
@@ -237,7 +238,7 @@ railway up --service agent
 ## Roadmap
 
 - [ ] Dynamic negotiation with unknown providers (read price from 402 response in real-time)
-- [ ] Lightning Network micropayments via WDK-Spark integration (announced Aug 2025 — sub-second x402 on Bitcoin when module ships)
+- [ ] Lightning Network x402 micropayments via `@tetherto/wdk-wallet-spark` (module available — Spark wallet registered in WDK, active development)
 - [ ] USA₮ support for US-regulated institutional users (architecturally ready — waiting for cross-chain expansion to Arbitrum/Plasma)
 - [ ] XAU₮ (Tether Gold) as treasury diversification asset
 - [ ] Live Aave APY from on-chain UI Data Provider
