@@ -130,7 +130,7 @@ npx serve src/dashboard -p 3000
 npm run mcp
 ```
 
-Exposes 6 tools for any MCP-compatible agent:
+Exposes **31 tools** for any MCP-compatible agent: 25 built-in WDK tools (wallet, swap, bridge, lending, pricing) + 6 Agelo domain-specific treasury tools:
 
 | Tool | Description |
 |------|-------------|

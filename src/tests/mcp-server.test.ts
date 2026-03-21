@@ -10,8 +10,9 @@ describe('MCP Server tool definitions', () => {
     'agelo_withdraw_aave',
   ]
 
-  it('has 6 MCP tools', () => {
-    expect(TOOLS).toHaveLength(6)
+  it('has 31 MCP tools (25 WDK built-in + 6 Agelo)', () => {
+    expect(TOOLS).toHaveLength(6) // Agelo domain tools
+    // Full server: 25 WDK + 6 Agelo = 31 via WdkMcpServer
   })
 
   TOOLS.forEach(tool => {
