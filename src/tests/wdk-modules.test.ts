@@ -7,6 +7,7 @@ describe('WDK module package names', () => {
     '@tetherto/wdk-protocol-lending-aave-evm',
     '@tetherto/wdk-protocol-bridge-usdt0-evm',
     '@tetherto/wdk-protocol-swap-velora-evm',
+    '@tetherto/wdk-wallet-spark',
   ]
 
   modules.forEach(mod => {
@@ -23,8 +24,8 @@ describe('WDK module package names', () => {
     expect(modules[0]).toBe('@tetherto/wdk')
   })
 
-  it('5 WDK modules used in project', () => {
-    expect(modules.length).toBe(5)
+  it('6 WDK modules used in project (including Spark)', () => {
+    expect(modules.length).toBe(6)
   })
 })
 
