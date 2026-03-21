@@ -167,7 +167,7 @@ On every x402 payment:
 ```
 src/
 ├── wallet/
-│   ├── wdk-setup.ts        # WDK core — Plasma + Ethereum + Arbitrum
+│   ├── wdk-setup.ts        # WDK core — Plasma + Ethereum + Arbitrum + Spark
 │   └── agent-wallet.ts     # Plasma wallet helpers
 ├── services/
 │   ├── lending.ts          # Aave V3 supply/withdraw/position
