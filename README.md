@@ -29,7 +29,7 @@ Before purchasing any service, the agent probes multiple providers, compares x40
 
 ## Verifiable On-Chain Transactions
 
-Todas las transacciones fueron ejecutadas durante el hackathon:
+All transactions were executed during the hackathon:
 
 | Action | Chain | TX Hash | Explorer |
 |--------|-------|---------|----------|
