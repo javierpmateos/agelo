@@ -76,8 +76,10 @@ User / External Agent
 | Module | Usage |
 |--------|-------|
 | `@tetherto/wdk` | Core orchestrator |
-| `@tetherto/wdk-mcp-toolkit` | Official MCP toolkit (35 tools) — Agelo implements 6 domain-specific treasury tools as a specialized layer |
+| `@tetherto/wdk-mcp-toolkit` | Official MCP toolkit — Agelo registers 25 built-in + 6 custom = 31 tools |
 | `@tetherto/wdk-wallet-evm` | Self-custodial wallets on Plasma + Ethereum + Arbitrum |
+| `@tetherto/wdk-wallet-spark` | Lightning Network wallet (Spark, registered — active development) |
+| `@tetherto/wdk-protocol-swap-velora-evm` | DEX aggregator swap on EVM chains |
 | `@tetherto/wdk-protocol-lending-aave-evm` | Aave V3 supply, withdraw, getAccountData |
 | `@tetherto/wdk-protocol-bridge-usdt0-evm` | USDT bridge (Ethereum → Arbitrum, in roadmap) |
 | `@x402/fetch` + `@x402/express` + `@x402/evm` | x402 client + server payments |
