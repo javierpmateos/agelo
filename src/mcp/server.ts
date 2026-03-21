@@ -5,6 +5,7 @@ import WalletManagerEvm from '@tetherto/wdk-wallet-evm'
 import AaveProtocolEvm from '@tetherto/wdk-protocol-lending-aave-evm'
 import Usdt0ProtocolEvm from '@tetherto/wdk-protocol-bridge-usdt0-evm'
 import VeloraProtocolEvm from '@tetherto/wdk-protocol-swap-velora-evm'
+import WalletManagerSpark from '@tetherto/wdk-wallet-spark'
 import { z } from 'zod'
 import { createRequire } from 'module'
 import * as dotenv from 'dotenv'
@@ -155,6 +156,7 @@ async function main() {
     .registerWallet('plasma',    WalletManagerEvm, { provider: process.env.PLASMA_RPC || 'https://rpc.plasma.to' })
     .registerWallet('ethereum',  WalletManagerEvm, { provider: process.env.ETH_RPC    || 'https://eth.drpc.org' })
     .registerWallet('arbitrum',  WalletManagerEvm, { provider: process.env.ARB_RPC    || 'https://arb1.arbitrum.io/rpc' })
+    .registerWallet('spark', WalletManagerSpark as any, { network: 'MAINNET' })
     .registerProtocol('arbitrum', 'aave',   AaveProtocolEvm)
     .registerProtocol('ethereum', 'usdt0',  Usdt0ProtocolEvm)
     .registerProtocol('arbitrum', 'usdt0',  Usdt0ProtocolEvm)
@@ -173,7 +175,7 @@ async function main() {
 
   const transport = new StdioServerTransport()
   await server.connect(transport)
-  console.error('Agelo MCP Server v3.0 — 25 WDK built-in + 6 Agelo treasury = 31 tools')
+  console.error('Agelo MCP Server v3.0 — 25 WDK built-in + 6 Agelo treasury = 31 tools (4 chains: Plasma, Ethereum, Arbitrum, Spark)')
   console.error('Chains:', server.getChains())
 }
 
