@@ -1,13 +1,12 @@
 {
-  "_comment": "Add mcpServers block to: ~/Library/Application Support/Claude/claude_desktop_config.json (Mac) or %APPDATA%/Claude/claude_desktop_config.json (Windows)",
   "mcpServers": {
     "agelo": {
-      "command": "node",
-      "args": ["/home/shavi/agelo/dist/mcp/server.js"],
+      "command": "npx",
+      "args": ["tsx", "src/mcp/server.ts"],
       "env": {
         "AGENT_SEED_PHRASE": "your twelve word seed phrase here",
         "PLASMA_RPC": "https://rpc.plasma.to",
-        "BASE_RPC": "https://mainnet.base.org"
+        "ARB_RPC": "https://arb1.arbitrum.io/rpc"
       }
     }
   }

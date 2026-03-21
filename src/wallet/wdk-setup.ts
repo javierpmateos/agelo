@@ -14,7 +14,7 @@ export async function getWDK() {
     .registerWallet("plasma",   WalletManagerEvm, { provider: process.env.PLASMA_RPC || "https://rpc.plasma.to" })
     .registerWallet("ethereum", WalletManagerEvm, { provider: process.env.ETH_RPC    || "https://eth.drpc.org" })
     .registerWallet("arbitrum", WalletManagerEvm, { provider: process.env.ARB_RPC    || "https://arb1.arbitrum.io/rpc" })
-    .registerWallet("spark",    WalletManagerSpark as any, {})
+    .registerWallet("spark",    WalletManagerSpark as any, { network: 'MAINNET' })
   console.log("  🔧 WDK initialized (Plasma + Ethereum + Arbitrum + Spark/Lightning)")
   return _wdk
 }
