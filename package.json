@@ -17,6 +17,7 @@
     "@anthropic-ai/sdk": "^0.39.0",
     "@modelcontextprotocol/sdk": "^1.27.1",
     "@tetherto/wdk": "^1.0.0-beta.6",
+    "@tetherto/wdk-mcp-toolkit": "github:tetherto/wdk-mcp-toolkit",
     "@tetherto/wdk-protocol-bridge-usdt0-evm": "latest",
     "@tetherto/wdk-protocol-lending-aave-evm": "^1.0.0-beta.3",
     "@tetherto/wdk-protocol-swap-velora-evm": "^1.0.0-beta.4",
@@ -31,7 +32,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
