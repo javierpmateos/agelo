@@ -27,11 +27,11 @@ Before purchasing any service, the agent probes multiple providers, compares x40
 
 ---
 
-## Transacciones reales verificables
+## Verifiable On-Chain Transactions
 
 Todas las transacciones fueron ejecutadas durante el hackathon:
 
-| Acción | Chain | TX Hash | Explorer |
+| Action | Chain | TX Hash | Explorer |
 |--------|-------|---------|----------|
 | Supply 8.41 USDT → Aave V3 | Arbitrum | `0xee856de3...` | [arbiscan.io](https://arbiscan.io/tx/0xee856de38ac3b1dd78f400b35affee1eb2a6659e48ec51e490f60e9227fb8b80) |
 | Withdraw 3.5 USDT ← Aave V3 | Arbitrum | `0xd7ccbe12...` | [arbiscan.io](https://arbiscan.io/tx/0xd7ccbe12a81e167525927a84c556c87492cc701ec7cf531991cf761424c893b8) |
@@ -43,7 +43,7 @@ Wallet: `0xD173ad2C8cDa46Ba9BeE73D6cEa6c015aA3054a6`
 
 ---
 
-## Arquitectura
+## Architecture
 ```
 User / External Agent
         ↓ natural language task
