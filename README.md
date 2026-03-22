@@ -142,7 +142,7 @@ Exposes **31 tools** for any MCP-compatible agent: 25 built-in WDK tools (wallet
 | `agelo_supply_aave` | Supply USDT to Aave V3 |
 | `agelo_withdraw_aave` | Withdraw from Aave V3 |
 
-Verified working with OpenClaw + WDK skill: read $8.41 Aave collateral live.
+Verified working with OpenClaw + WDK skill: read Aave collateral live.
 
 ---
 

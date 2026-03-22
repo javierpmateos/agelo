@@ -67,9 +67,9 @@ describe('Multi-chain wallet addresses', () => {
 describe('Verified transaction hashes', () => {
   const txs = [
     { hash: '0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3', chain: 'arbitrum', action: 'Aave supply 9.87 USDT' },
-    { hash: '0xd7ccbe12a81e167525927a84c556c87492cc701ec7cf531991cf761424c893b8', chain: 'arbitrum', action: 'Aave withdraw 3.5 USDT' },
-    { hash: '0x7738691a574e6c9df0ceb429074bb5ddfe91ae025df1f2f370aac09c9243ad9b', chain: 'plasma',   action: 'x402 payment aave-rates' },
-    { hash: '0xb97ab2e25e4bba54c53dbf6ca1791b3ee0081cdba19d6c83df89888f8f9b1d08', chain: 'plasma',   action: 'x402 payment financial-report' },
+    { hash: '0x330f4b84385ada6194bc9808de98d5a3dbd9879facee9a8ec7e905e80ee8a5a4', chain: 'arbitrum', action: 'x402 payment plasma' },
+    { hash: '0xc82f7c1f3aa7e11b94b2a128442f764274c08ac0dc2c85187ce830a8dfa9149f', chain: 'plasma',   action: 'x402 payment aave-rates' },
+    { hash: '0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3', chain: 'plasma',   action: 'x402 payment financial-report' },
   ]
 
   txs.forEach(tx => {
