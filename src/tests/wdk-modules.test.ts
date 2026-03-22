@@ -66,7 +66,7 @@ describe('Multi-chain wallet addresses', () => {
 
 describe('Verified transaction hashes', () => {
   const txs = [
-    { hash: '0xee856de38ac3b1dd78f400b35affee1eb2a6659e48ec51e490f60e9227fb8b80', chain: 'arbitrum', action: 'Aave supply 8.41 USDT' },
+    { hash: '0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3', chain: 'arbitrum', action: 'Aave supply 9.87 USDT' },
     { hash: '0xd7ccbe12a81e167525927a84c556c87492cc701ec7cf531991cf761424c893b8', chain: 'arbitrum', action: 'Aave withdraw 3.5 USDT' },
     { hash: '0x7738691a574e6c9df0ceb429074bb5ddfe91ae025df1f2f370aac09c9243ad9b', chain: 'plasma',   action: 'x402 payment aave-rates' },
     { hash: '0xb97ab2e25e4bba54c53dbf6ca1791b3ee0081cdba19d6c83df89888f8f9b1d08', chain: 'plasma',   action: 'x402 payment financial-report' },

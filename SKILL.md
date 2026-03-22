@@ -51,9 +51,8 @@ Agelo runs two autonomous loops:
 
 ## Real transactions (hackathon)
 
-- Aave supply: [0xee856de3...](https://arbiscan.io/tx/0xee856de38ac3b1dd78f400b35affee1eb2a6659e48ec51e490f60e9227fb8b80)
-- Aave withdraw: [0xd7ccbe12...](https://arbiscan.io/tx/0xd7ccbe12a81e167525927a84c556c87492cc701ec7cf531991cf761424c893b8)
-- x402 payment: [0x7738691a...](https://plasmascan.to/tx/0x7738691a574e6c9df0ceb429074bb5ddfe91ae025df1f2f370aac09c9243ad9b)
+- Aave supply: [0xee856de3...](https://arbiscan.io/tx/0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3)
+- Aave withdraw: [0xd7ccbe12...](https://arbiscan.io/tx/0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3)
 
 ## Setup
 ```bash
