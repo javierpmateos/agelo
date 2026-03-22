@@ -38,6 +38,14 @@ export async function getAavePosition() {
 export async function supplyToAave(assetSymbol: string, amount: bigint) {
   const token = AAVE_ASSETS[assetSymbol as keyof typeof AAVE_ASSETS]
   if (!token) throw new Error(`Unknown asset: ${assetSymbol}`)
+
+  // Guard: verify balance before approve to prevent MEV/frontrunning on open approvals
+  const guardAccount = await getArbAccount()
+  const rawBalance = await guardAccount.getTokenBalance(token)
+  const balance = BigInt(rawBalance ?? 0n)
+  if (balance < amount) {
+    throw new Error(`Insufficient ${assetSymbol} balance: have ${Number(balance)/1e6}, need ${Number(amount)/1e6}`)
+  }
   const { aave, account } = await getAave()
   console.log(`  🔓 Approving ${assetSymbol} for Aave...`)
   await account.approve({ token, spender: AAVE_POOL, amount })
