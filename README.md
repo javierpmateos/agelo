@@ -33,7 +33,9 @@ All transactions were executed during the hackathon:
 
 | Action | Chain | TX Hash | Explorer |
 |--------|-------|---------|----------|
-| Supply 9.87 USDT → Aave V3 | Arbitrum | `0xee856de3...` | [arbiscan.io](https://arbiscan.io/tx/0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3) |
+| Supply 9.87 USDT → Aave V3 | Arbitrum | `0xda03570a...` | [arbiscan.io](https://arbiscan.io/tx/0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3) |
+| x402 payment (aave-rates) | Plasma | `0x330f4b84...` | [plasmascan.to](https://plasmascan.to/tx/0x330f4b84385ada6194bc9808de98d5a3dbd9879facee9a8ec7e905e80ee8a5a4) |
+| x402 payment (financial-report) | Plasma | `0xc82f7c1f...` | [plasmascan.to](https://plasmascan.to/tx/0xc82f7c1f3aa7e11b94b2a128442f764274c08ac0dc2c85187ce830a8dfa9149f) |
 
 Wallet: `0x8C1b70A0189e814772B2bcb0226Fc60e79172Ff9`  
 → [Arbitrum](https://arbiscan.io/address/0x8C1b70A0189e814772B2bcb0226Fc60e79172Ff9) · [Plasma](https://plasmascan.to/address/0x8C1b70A0189e814772B2bcb0226Fc60e79172Ff9)
