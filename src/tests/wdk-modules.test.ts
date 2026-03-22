@@ -67,8 +67,7 @@ describe('Multi-chain wallet addresses', () => {
 describe('Verified transaction hashes', () => {
   const txs = [
     { hash: '0xda03570a224772f83c4baa1dc4a47239db274d3db41cbb6cbdef6a29f2d590b3', chain: 'arbitrum', action: 'Aave supply 9.87 USDT' },
-    { hash: '0x330f4b84385ada6194bc9808de98d5a3dbd9879facee9a8ec7e905e80ee8a5a4', chain: 'arbitrum', action: 'x402 payment plasma' },
-    { hash: '0xc82f7c1f3aa7e11b94b2a128442f764274c08ac0dc2c85187ce830a8dfa9149f', chain: 'plasma',   action: 'x402 payment aave-rates' },
+    { hash: '0x330f4b84385ada6194bc9808de98d5a3dbd9879facee9a8ec7e905e80ee8a5a4', chain: 'plasma',   action: 'x402 payment aave-rates' },
     { hash: '0xc82f7c1f3aa7e11b94b2a128442f764274c08ac0dc2c85187ce830a8dfa9149f', chain: 'plasma',   action: 'x402 payment financial-report' },
   ]
 
@@ -78,9 +77,13 @@ describe('Verified transaction hashes', () => {
     })
   })
 
-  it('has 2 Arbitrum transactions', () => {
+  it('has 3 verified transactions total', () => {
+    expect(txs).toHaveLength(3)
+  })
+
+  it('has 1 Arbitrum transactions', () => {
     const arb = txs.filter(t => t.chain === 'arbitrum')
-    expect(arb).toHaveLength(2)
+    expect(arb).toHaveLength(1)
   })
 
   it('has 2 Plasma transactions', () => {
